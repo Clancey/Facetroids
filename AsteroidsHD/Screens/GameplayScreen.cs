@@ -30,9 +30,9 @@ namespace AsteroidsHD
 	/*
 	public enum GameType
 	{
+		Facebook,
 		Retro,
-		Modern,
-		Facebook
+		Modern
 	}
 	*/
 	/// <summary>
@@ -54,6 +54,7 @@ namespace AsteroidsHD
 		//float scale;
 		bool useAccel = true;
 		GameType gameType = GameType.Facebook;
+		bool soundEnabled = true;
 		double invinisbleTimeLeft = 0;
 		double shipResetSeconds = 0;
 
@@ -66,18 +67,22 @@ namespace AsteroidsHD
 		Texture2D gamePadTexture;
 		List<Texture2D> asteroidTextures = new List<Texture2D> ();
 		List<Sprite> asteroids = new List<Sprite> ();
-		ObjModel AwesomeAsteroid;
+		
+		SoundEffect     alienFired;
+		SoundEffect     alienDied;
+		SoundEffect     playerFired;
+		SoundEffect     playerDied;
 
 		SpriteFont myFont;
-		Texture2D banner;
-		Texture2D asteroid;
 
 		float distance = 0.0f;
 
 		Random random = new Random ();
 
 		bool GameOver = true;
-
+		
+		
+        ParticleSystem  particles;
 
 		#endregion
 
@@ -155,8 +160,8 @@ namespace AsteroidsHD
                 Content = new ContentManager(ScreenManager.Game.Services, "Content");
 			// Create a new SpriteBatch, which can be used to draw textures.
 			//spriteBatch = ScreenManager.SpriteBatch;
-			AwesomeAsteroid = ObjModelLoader.LoadFromFile ("Models/rock.obj");
-			asteroid = Texture2D.FromFile (ScreenManager.GraphicsDevice, "Models/rock.jpg", 256, 256);
+			//AwesomeAsteroid = ObjModelLoader.LoadFromFile ("Models/rock.obj");
+			//asteroid = Texture2D.FromFile (ScreenManager.GraphicsDevice, "Models/rock.jpg", 256, 256);
 			
 			gamePadTexture = Content.Load<Texture2D> ("gamepad.png");
 			var ship1t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship.pdf";
@@ -171,7 +176,10 @@ namespace AsteroidsHD
 			
 			myFont = Content.Load<SpriteFont> ("Fonts/SpriteFont1");
 			
-			banner = Content.Load<Texture2D> ("BANNER");
+            alienFired = ScreenManager.Game.Content.Load<SoundEffect>("fire");
+            alienDied = ScreenManager.Game.Content.Load<SoundEffect>("Alien_Hit");
+            playerFired = ScreenManager.Game.Content.Load<SoundEffect>("fire");
+            playerDied = ScreenManager.Game.Content.Load<SoundEffect>("Player_Hit");
 			
 			var gamePadH = ScreenHeight - 100;
 			var gamePadLeft = ScreenWidth - 80;
@@ -197,6 +205,7 @@ namespace AsteroidsHD
 			thumbStick.Texture = gamePadTexture;
 			thumbStick.TextureRect = new Rectangle (2, 2, 68, 68);
 			
+            particles = new ParticleSystem(ScreenManager.Game.Content, ScreenManager.SpriteBatch);
 			
 			GamePad.LeftThumbStickDefinition = thumbStick;
 			
@@ -208,25 +217,26 @@ namespace AsteroidsHD
 
 		public void ReloadAsteroids ()
 		{
+			//Console.WriteLine(gameType);
 			asteroidTextures.Clear ();
 			if (gameType == GameType.Modern) {
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/asteroid-front.pdf", 100, 100));
+				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/asteroid-front.pdf", 60, 60));
 				return;
 			} else if (gameType == GameType.Facebook) {
 				foreach (var img in Facebook.GetImages ()) {
-					//Console.WriteLine (img);
-					asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, img, 100, 100));
+					Console.WriteLine (img);
+					asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice,img,60, 60));
 				}
 				return;
 			}
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/large" + i + ".pdf", 100, 100));
+				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/large" + i + ".pdf", 60, 60));
 			//60
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/medium" + i + ".pdf", 100, 100));
+				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/medium" + i + ".pdf", 60, 60));
 			//45
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/small" + i + ".pdf", 100, 100));
+				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/small" + i + ".pdf", 60, 60));
 			//25
 		}
 
@@ -285,11 +295,15 @@ namespace AsteroidsHD
 				AllDead ();
 				
 			}
+			
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+			
+                particles.Update(elapsed);
 		}
-
+		bool leftPressed;
 		private void updateFromAccelerometer (GameTime gameTime, TouchCollection touchState)
 		{
-			
+			//gameTime.
 			var accelState = Accelerometer.GetState ().Acceleration;
 			
 			var position = new Vector2 (0, 0);
@@ -311,7 +325,6 @@ namespace AsteroidsHD
 					else
 						rightSideTouched = true;
 				}
-				
 			}
 			
 			if (!RightSideTouchedOld && rightSideTouched)
@@ -387,7 +400,6 @@ namespace AsteroidsHD
 			
 			ship.Velocity = Vector2.Zero;
 		}
-
 		private void AccelerateShip ()
 		{
 			ship.IsThrusting = true;
@@ -449,6 +461,7 @@ namespace AsteroidsHD
 		{
 			int value;
 			var asteroidCount = baseAsteroids + level;
+			//asteroidCount = 1;
 			for (int i = 0; i < asteroidCount; i++) {
 				int index = random.Next (0, asteroidTextures.Count - 1);
 				
@@ -514,13 +527,19 @@ namespace AsteroidsHD
 				
 				if (a.Alive && CheckShipCollision (a)) {
 					GamePad.SetVibration (PlayerIndex.One, 1f, 1f);
+					if (soundEnabled)
+						playerDied.Play();
+					
+                    particles.CreatePlayerExplosion(new Vector2(a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					a.Kill ();
 					lives--;
 					invinisbleTimeLeft = 5;
 					shipResetSeconds = gameTime.TotalRealTime.TotalSeconds;
 					SetupShip ();
 					if (lives < 1)
+					{
 						GameOver = true;
+					}
 				}
 			}
 			
@@ -538,8 +557,14 @@ namespace AsteroidsHD
             Cathetus2 *= Cathetus2;
 
             distance = (float)Math.Sqrt(Cathetus1 + Cathetus2);
-
-            if ((int)distance < ship.Width)
+			
+			//Console.WriteLine("Asteroid:" + asteroid.Center + "," + asteroid.Width + "," + asteroid.Height);
+			//Console.WriteLine("Ship:" + position2 + "," + ship.Width + "," + ship.Height);
+			//Console.WriteLine("Distance:" + distance);
+			var width = ship.Width;
+			if(asteroid.Width > ship.Width)
+				width += (asteroid.Width - ship.Width) / 2;
+            if ((int)distance < width)
                 return true;
 
             return false;
@@ -558,8 +583,8 @@ namespace AsteroidsHD
 			
 			distance = (float)Math.Sqrt (Cathetus1 + Cathetus2);
 			
-			if(asteroid == asteroids[0])
-				Console.WriteLine(distance + " : " + asteroid.Width);
+			//if(asteroid == asteroids[0])
+			//	Console.WriteLine(distance + " : " + asteroid.Width);
 			if( (int)distance < asteroid.Width/2)
 			{
 				//Console.WriteLine(distance + "," + asteroid.Width + " : " + asteroid.Position + "," + bullet.Position);
@@ -609,6 +634,10 @@ namespace AsteroidsHD
 						a.Kill ();
 						destroyed.Add (a);
 						b.Kill ();
+						if(soundEnabled)
+							alienDied.Play();
+						
+						particles.CreateAlienExplosion(new Vector2(a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					}
 				}
 				
@@ -680,10 +709,10 @@ namespace AsteroidsHD
 			float yVelocity = (float)(random.NextDouble () * 2 + .5);
 			
 			if (random.Next (2) == 1)
-				xVelocity *= Util.IsIpad ? -1.0f : -.75f;
+				xVelocity *= Util.IsIpad ? -1.0f : -.5f;
 			
 			if (random.Next (2) == 1)
-				yVelocity *= Util.IsIpad ? -1.0f : -.75f;
+				yVelocity *= Util.IsIpad ? -1.0f : -.5f;
 			
 			return new Vector2 (xVelocity, yVelocity);
 		}
@@ -704,6 +733,8 @@ namespace AsteroidsHD
 			newBullet.Create ();
 			
 			bullets.Add (newBullet);
+			if(soundEnabled)
+				playerFired.Play();
 		}
 
 		/// <summary>
@@ -750,7 +781,7 @@ namespace AsteroidsHD
 				if (a.Alive) {
 					
 					//spriteBatch.Draw (astroidBacking, a.Position, null, Color.White, a.Rotation, a.Center, a.Scale, SpriteEffects.None, 1.0f);
-					Console.WriteLine("s:" +a.Scale + " p: " + a.Position + " :c" + a.Center);
+					//Console.WriteLine("s:" +a.Scale + " p: " + a.Position + " :c" + a.Center);
 					spriteBatch.Draw (a.Texture, a.Position, null, Color.White, a.Rotation, a.Center, a.Scale, SpriteEffects.None, 1.0f);
 				}
 			}
@@ -758,6 +789,7 @@ namespace AsteroidsHD
 			if (!useAccel)
 				GamePad.Draw (gameTime, spriteBatch);
 			
+			particles.Draw();
 			spriteBatch.End ();
 			
             if (TransitionPosition > 0)

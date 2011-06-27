@@ -32,7 +32,17 @@ namespace AsteroidsHD
         #region Fields
 
         ContentManager content;
-        Texture2D backgroundTexture;
+        //Texture2D backgroundTexture;
+		Texture2D t2dBackground, t2dParallax;
+		int iViewportWidth = 1280;
+        int iViewportHeight = 720;
+ 
+        int iBackgroundWidth = 1920;
+        int iBackgroundHeight = 720;
+ 
+        int iParallaxWidth = 1680;
+        int iParallaxHeight = 480;
+
 
         #endregion
 
@@ -61,7 +71,16 @@ namespace AsteroidsHD
             if (content == null)
                 content = new ContentManager(ScreenManager.Game.Services, "Content");
 
-            backgroundTexture = content.Load<Texture2D>("background");
+			
+			t2dBackground = content.Load<Texture2D>("PrimaryBackground");
+            iBackgroundWidth = t2dBackground.Width;
+            iBackgroundHeight = t2dBackground.Height;
+            t2dParallax = content.Load<Texture2D>("ParallaxStars");
+            iParallaxWidth = t2dParallax.Width;
+            iParallaxHeight = t2dParallax.Height;
+			
+			iViewportWidth = ScreenManager.Width + 5;
+			iViewportHeight = ScreenManager.Height + 5;
         }
 
 
@@ -89,6 +108,8 @@ namespace AsteroidsHD
         public override void Update(GameTime gameTime, bool otherScreenHasFocus,
                                                        bool coveredByOtherScreen)
         {
+			BackgroundOffset += 1;
+            ParallaxOffset += 3;
             base.Update(gameTime, otherScreenHasFocus, false);
         }
 
@@ -107,13 +128,102 @@ namespace AsteroidsHD
 			spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, _view);
             //spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.Opaque);
 
-            spriteBatch.Draw(backgroundTexture, fullscreen,
-                             new Color(fade, fade, fade));
+            //spriteBatch.Draw(backgroundTexture, fullscreen,
+              //               new Color(fade, fade, fade));
+			Draw(spriteBatch);
 
             spriteBatch.End();
         }
-
-
+		
+		public void Draw(SpriteBatch spriteBatch)
+        {
+            // Draw the background panel, offset by the player's location
+            spriteBatch.Draw(
+                t2dBackground,
+                new Rectangle(-1 * iBackgroundOffset, 
+                              0, iBackgroundWidth, 
+                              iViewportHeight), 
+                Color.White);
+            
+            // If the right edge of the background panel will end 
+            // within the bounds of the display, draw a second copy 
+            // of the background at that location.
+            if (iBackgroundOffset > iBackgroundWidth-iViewportWidth) { 
+                spriteBatch.Draw(
+                    t2dBackground,
+                    new Rectangle(
+                      (-1 * iBackgroundOffset) + iBackgroundWidth, 
+                      0, 
+                      iBackgroundWidth,
+                      iViewportHeight), 
+                    Color.White); }
+ 
+            if (drawParallax)
+            {
+                // Draw the parallax star field
+                spriteBatch.Draw(
+                    t2dParallax,
+                    new Rectangle(-1 * iParallaxOffset, 
+                                  0, iParallaxWidth, 
+                                  iViewportHeight), 
+                    Color.SlateGray);
+                // if the player is past the point where the star 
+                // field will end on the active screen we need 
+                // to draw a second copy of it to cover the 
+                // remaining screen area.
+                if (iParallaxOffset > iParallaxWidth-iViewportWidth) { 
+                    spriteBatch.Draw(
+                        t2dParallax, 
+                        new Rectangle(
+                          (-1 * iParallaxOffset) + iParallaxWidth, 
+                          0,
+                          iParallaxWidth,
+                          iViewportHeight), 
+                        Color.SlateGray); }
+            }
+        }
+		int iBackgroundOffset;
+        int iParallaxOffset;
+		public int BackgroundOffset
+        {
+            get { return iBackgroundOffset; }
+            set
+            {
+                iBackgroundOffset = value;
+                if (iBackgroundOffset < 0)
+                {
+                    iBackgroundOffset += iBackgroundWidth;
+                }
+                if (iBackgroundOffset > iBackgroundWidth)
+                {
+                    iBackgroundOffset -= iBackgroundWidth;
+                }
+            }
+        }
+ 
+        public int ParallaxOffset
+        {
+            get { return iParallaxOffset; }
+            set
+            {
+                iParallaxOffset = value;
+                if (iParallaxOffset < 0)
+                {
+                    iParallaxOffset += iParallaxWidth;
+                }
+                if (iParallaxOffset > iParallaxWidth)
+                {
+                    iParallaxOffset -= iParallaxWidth;
+                }
+            }
+        }
+		bool drawParallax = true;
+ 
+        public bool DrawParallax
+        {
+            get { return drawParallax; }
+            set { drawParallax = value; }
+        }
         #endregion
     }
 }

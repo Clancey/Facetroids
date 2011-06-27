@@ -10,7 +10,10 @@ namespace AsteroidsHD
 		{
 			string[] images = Directory.GetFiles(ImageStore.RoundedPicDir).Where(x=> x.ToLower().EndsWith(".png")).ToArray();
 			if(images.Count() == 0)
+			{
+				Console.WriteLine("No Images found");
 				images = new string[] {"Content/asteroid-front.pdf"};
+			}
 			
 			Console.WriteLine(images[0]);
 			return images;

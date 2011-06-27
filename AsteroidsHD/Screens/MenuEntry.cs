@@ -117,7 +117,7 @@ namespace AsteroidsHD
         }
 
 		public Rectangle Frame {get;set;}
-		
+		public Vector2 Offset;
         /// <summary>
         /// Draws the menu entry. This can be overridden to customize the appearance.
         /// </summary>
@@ -142,11 +142,11 @@ namespace AsteroidsHD
             SpriteBatch spriteBatch = screenManager.SpriteBatch;
             SpriteFont font = screenManager.Font;
 			Vector2 fontSize =font.MeasureString(text);
-            Vector2 origin = new Vector2(fontSize.X/2, font.LineSpacing / 2);
+            Offset = new Vector2(fontSize.X/2, font.LineSpacing / 2);
 
             spriteBatch.DrawString(font, text, position, color, 0,
-                                   origin, scale, SpriteEffects.None, 0);
-			Frame = new Rectangle((int)position.X,(int)position.Y,
+                                   Offset, scale, SpriteEffects.None, 0);
+			Frame = new Rectangle((int)(position.X - (Offset.X * globalScale)),(int)position.Y,
 			                      (int)((fontSize.X + screen.ScreenManager.Font.Spacing) * globalScale),
 			                      (int)screen.ScreenManager.Font.LineSpacing);
         }

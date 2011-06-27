@@ -19,9 +19,9 @@ namespace AsteroidsHD
 	
 	public enum GameType
 	{
+		Facebook,
 		Retro,
-		Modern,
-		Facebook
+		Modern
 	}
 	/// <summary>
 	/// This is the main type for your game

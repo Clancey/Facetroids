@@ -206,6 +206,17 @@ namespace AsteroidsHD
 								StartPicDownload (id, url); 
 							} catch (Exception e){
 								Console.WriteLine (e);
+							//
+							lock (queuedUpdates){
+									queuedUpdates.Add (id);
+								
+									// If this is the first queued update, must notify
+									if (queuedUpdates.Count == 1)										
+										nsDispatcher.BeginInvokeOnMainThread (NotifyImageListeners);
+								
+							}
+										
+							//
 							}
 						});
 				}
@@ -248,6 +259,8 @@ namespace AsteroidsHD
 		                }
 					}
 					
+					var imgURl = "http://graph.facebook.com/" + id + "/picture?type=large";
+					DataAccess.parseFaces(DataAccess.faceRest.faces_detect(new List<string>{imgURl},null,null,null));
 					//RoundedPic(path,id);
 					downloaded = true;
 				} catch (Exception e) {
@@ -257,13 +270,12 @@ namespace AsteroidsHD
 				bool doInvoke = false;
 				
 				lock (queuedUpdates){
-					if (downloaded){
 						queuedUpdates.Add (id);
 					
 						// If this is the first queued update, must notify
 						if (queuedUpdates.Count == 1)
 							doInvoke = true;
-					}
+					
 				}
 				
 				lock (requestQueue){

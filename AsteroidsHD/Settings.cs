@@ -23,6 +23,12 @@ namespace AsteroidsHD
 			get {return DateTime.Parse(prefs.StringForKey("fbauthexp")); }
 			set { prefs.SetString(value.ToString(),"fbauthexp");}
 		}
+		/*
+		public static GameType GameType {
+			get{return GameType.Facebook; return (GameType)prefs.IntForKey("gameType");}
+			set{prefs.SetInt((int)value,"gameType");}
+		}
+		*/
 		
 		
 	}

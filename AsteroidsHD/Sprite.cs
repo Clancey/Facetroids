@@ -33,7 +33,7 @@ namespace AsteroidsHD
 			else
 				Scale = .6f;
             position = Vector2.Zero;
-            center = new Vector2(Width / 2, Height / 2);
+            center = new Vector2(texture.Width / 2, texture.Height / 2);
             velocity = Vector2.Zero;
 
 
@@ -83,9 +83,8 @@ namespace AsteroidsHD
         public float Scale
         {
             get { return scale; }
-            set { scale = value; 
-			//center = new Vector2(Width / 2, Height / 2);
-			}
+            set { scale = value; }
+			//center = new Vector2(Width / 2, Height / 2);}
         }
 
         public bool Alive

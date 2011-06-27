@@ -121,8 +121,8 @@ namespace AsteroidsHD
 			var path = UIBezierPath.FromOval(new RectangleF(0,0,face.Rect.Width,face.Rect.Height)).CGPath;
 			UIGraphics.BeginImageContext(new SizeF(face.Width,face.Height));
 			var c = UIGraphics.GetCurrentContext ();
-			//c.AddPath(path);
-			//c.Clip();
+			c.AddPath(path);
+			c.Clip();
 			//c.TranslateCTM(face.Width /2,face.Height /2 );
 			//CGContextTranslateCTM (ctx, center.x, center.y);
 			//c.RotateCTM(face.Roll);

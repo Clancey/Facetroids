@@ -4,6 +4,7 @@ using MonoTouch.Facebook.Authorization;
 using System.Collections.Generic;
 using ClanceysLib;
 using MonoTouch.UIKit;
+using Microsoft.Xna.Framework.Graphics;
 namespace AsteroidsHD
 {
 	public class FacebookFriendFinder 
