@@ -90,12 +90,6 @@ namespace AsteroidsHD
 					for (int i = 0; i < menuEntries.Count; i++)
 					{
 						MenuEntry menuEntry = menuEntries[i];
-						if(i == 1)
-						{
-							Console.WriteLine(menuEntry.Frame);
-							Console.WriteLine(touch.State);
-							Console.WriteLine(position);
-						}
 						if(menuEntry.Frame.Contains(position))
 							selectedEntry = i;
 					}	

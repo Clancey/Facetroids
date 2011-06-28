@@ -320,14 +320,13 @@ namespace AsteroidsHD
 						
 		public int Height {
 			get {
-				
 				switch (this.GraphicsDevice.PresentationParameters.DisplayOrientation)
 	        	{	
 				case DisplayOrientation.LandscapeLeft:
 				case DisplayOrientation.LandscapeRight:
-					return  GraphicsDevice.Viewport.Width;
+					return  (int)(GraphicsDevice.Viewport.Width/ UIScreen.MainScreen.Scale);
 				default:
-					return GraphicsDevice.Viewport.Height;
+					return (int)(GraphicsDevice.Viewport.Height/ UIScreen.MainScreen.Scale);
 				}
 			}
 		}

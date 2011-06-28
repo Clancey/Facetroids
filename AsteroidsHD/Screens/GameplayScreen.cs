@@ -27,14 +27,14 @@ using OpenTK.Graphics.ES11;
 
 namespace AsteroidsHD
 {
-	/*
+
 	public enum GameType
 	{
-		Facebook,
-		Retro,
-		Modern
+		Facebook = 0,
+		Retro = 1,
+		Modern = 2
 	}
-	*/
+
 	/// <summary>
 	/// This screen implements the actual game logic. It is just a
 	/// placeholder to get the idea across: you'll probably want to
@@ -57,6 +57,7 @@ namespace AsteroidsHD
 		bool soundEnabled = true;
 		double invinisbleTimeLeft = 0;
 		double shipResetSeconds = 0;
+		double invinsibleResetTime = 3;
 
 		int baseAsteroids = Util.IsIpad ? 5 : 3;
 
@@ -67,11 +68,11 @@ namespace AsteroidsHD
 		Texture2D gamePadTexture;
 		List<Texture2D> asteroidTextures = new List<Texture2D> ();
 		List<Sprite> asteroids = new List<Sprite> ();
-		
-		SoundEffect     alienFired;
-		SoundEffect     alienDied;
-		SoundEffect     playerFired;
-		SoundEffect     playerDied;
+
+		SoundEffect alienFired;
+		SoundEffect alienDied;
+		SoundEffect playerFired;
+		SoundEffect playerDied;
 
 		SpriteFont myFont;
 
@@ -80,9 +81,9 @@ namespace AsteroidsHD
 		Random random = new Random ();
 
 		bool GameOver = true;
-		
-		
-        ParticleSystem  particles;
+
+
+		ParticleSystem particles;
 
 		#endregion
 
@@ -95,8 +96,8 @@ namespace AsteroidsHD
 		public GameplayScreen ()
 		{
 			
-            TransitionOnTime = TimeSpan.FromSeconds(1.5);
-            TransitionOffTime = TimeSpan.FromSeconds(0.5);
+			TransitionOnTime = TimeSpan.FromSeconds (1.5);
+			TransitionOffTime = TimeSpan.FromSeconds (0.5);
 			ShouldPause = true;
 			
 		}
@@ -139,7 +140,7 @@ namespace AsteroidsHD
 			CreateAsteroids ();
 			GameOver = false;
 		}
-		
+
 
 		private void SetupShip ()
 		{
@@ -155,15 +156,17 @@ namespace AsteroidsHD
 		/// </summary>
 		public override void LoadContent ()
 		{
-			
-            if (Content == null)
-                Content = new ContentManager(ScreenManager.Game.Services, "Content");
+			ScreenWidth = ScreenManager.Width;
+			ScreenHeight = ScreenManager.Height;
+			gameType = Settings.GameType;
+			if (Content == null)
+				Content = new ContentManager (ScreenManager.Game.Services, "Content");
 			// Create a new SpriteBatch, which can be used to draw textures.
 			//spriteBatch = ScreenManager.SpriteBatch;
 			//AwesomeAsteroid = ObjModelLoader.LoadFromFile ("Models/rock.obj");
 			//asteroid = Texture2D.FromFile (ScreenManager.GraphicsDevice, "Models/rock.jpg", 256, 256);
 			
-			gamePadTexture = Content.Load<Texture2D> ("gamepad.png");
+			gamePadTexture = Content.Load<Texture2D> ("pause.png");
 			var ship1t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship.pdf";
 			var ship2t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship-thrust.pdf";
 			var ship1 = Texture2D.FromFile (ScreenManager.GraphicsDevice, ship1t, 35, 35);
@@ -176,41 +179,44 @@ namespace AsteroidsHD
 			
 			myFont = Content.Load<SpriteFont> ("Fonts/SpriteFont1");
 			
-            alienFired = ScreenManager.Game.Content.Load<SoundEffect>("fire");
-            alienDied = ScreenManager.Game.Content.Load<SoundEffect>("Alien_Hit");
-            playerFired = ScreenManager.Game.Content.Load<SoundEffect>("fire");
-            playerDied = ScreenManager.Game.Content.Load<SoundEffect>("Player_Hit");
+			alienFired = ScreenManager.Game.Content.Load<SoundEffect> ("fire");
+			alienDied = ScreenManager.Game.Content.Load<SoundEffect> ("Alien_Hit");
+			playerFired = ScreenManager.Game.Content.Load<SoundEffect> ("fire");
+			playerDied = ScreenManager.Game.Content.Load<SoundEffect> ("Player_Hit");
 			
-			var gamePadH = ScreenHeight - 100;
+			var gamePadH = 0 + 10;
 			var gamePadLeft = ScreenWidth - 80;
-			//Console.WriteLine (gamePadH);
+			//Console.WriteLine (gamePadLeft);
 			// Set the virtual GamePad
 			ButtonDefinition BButton = new ButtonDefinition ();
 			BButton.Texture = gamePadTexture;
-			BButton.Position = new Vector2 (gamePadLeft, gamePadH + 10);
+			BButton.Position = new Vector2 (gamePadLeft, gamePadH);
 			BButton.Type = Buttons.B;
-			BButton.TextureRect = new Rectangle (72, 77, 36, 36);
+			BButton.TextureRect = new Rectangle (0, 0, 30, 30);
 			
+			GamePad.ButtonsDefinitions.Add (BButton);
+			/*
 			ButtonDefinition AButton = new ButtonDefinition ();
 			AButton.Texture = gamePadTexture;
 			AButton.Position = new Vector2 (gamePadLeft - 75, gamePadH + 10);
 			AButton.Type = Buttons.A;
 			AButton.TextureRect = new Rectangle (73, 114, 36, 36);
+			*/			
 			
-			GamePad.ButtonsDefinitions.Add (BButton);
-			GamePad.ButtonsDefinitions.Add (AButton);
+			//GamePad.ButtonsDefinitions.Add (AButton);
 			
-			ThumbStickDefinition thumbStick = new ThumbStickDefinition ();
-			thumbStick.Position = new Vector2 (50, gamePadH);
-			thumbStick.Texture = gamePadTexture;
-			thumbStick.TextureRect = new Rectangle (2, 2, 68, 68);
+			//ThumbStickDefinition thumbStick = new ThumbStickDefinition ();
+			//thumbStick.Position = new Vector2 (50, gamePadH);
+			//thumbStick.Texture = gamePadTexture;
+			//thumbStick.TextureRect = new Rectangle (2, 2, 68, 68);
 			
-            particles = new ParticleSystem(ScreenManager.Game.Content, ScreenManager.SpriteBatch);
 			
-			GamePad.LeftThumbStickDefinition = thumbStick;
+			//GamePad.LeftThumbStickDefinition = thumbStick;
 			
 			SetupGame ();
 			
+			if (gameType != GameType.Retro)
+				particles = new ParticleSystem (ScreenManager.Game.Content, ScreenManager.SpriteBatch);
 			ScreenManager.Game.ResetElapsedTime ();
 			
 		}
@@ -224,8 +230,8 @@ namespace AsteroidsHD
 				return;
 			} else if (gameType == GameType.Facebook) {
 				foreach (var img in Facebook.GetImages ()) {
-					Console.WriteLine (img);
-					asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice,img,60, 60));
+					//Console.WriteLine (img);
+					asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, img, 60, 60));
 				}
 				return;
 			}
@@ -273,8 +279,10 @@ namespace AsteroidsHD
 				
 				if (GameOver) {
 					asteroids.Clear ();
-					ship.Kill ();					
-					ExitScreen();
+					ship.Kill ();
+					ContinueMenuScreen cont = new ContinueMenuScreen ();
+					cont.Continue += delegate { SetupGame (); };
+					ScreenManager.AddScreen (cont, ControllingPlayer);
 					return;
 					
 				}
@@ -287,8 +295,10 @@ namespace AsteroidsHD
 				
 				
 				//Console.WriteLine(invinisbleTimeLeft);
-				if(invinisbleTimeLeft > 0)
-					invinisbleTimeLeft += (shipResetSeconds - gameTime.TotalRealTime.TotalSeconds);
+				if (invinisbleTimeLeft > 0) {
+					invinisbleTimeLeft = invinsibleResetTime - (gameTime.TotalRealTime.TotalSeconds - shipResetSeconds);
+					//Console.WriteLine ("invinisbleTimeLeft: " + invinisbleTimeLeft);
+				}
 				UpdateShip ();
 				UpdateAsteroids (gameTime);
 				UpdateBullets ();
@@ -296,13 +306,23 @@ namespace AsteroidsHD
 				
 			}
 			
-            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+			float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
 			
-                particles.Update(elapsed);
+			if (gameType != GameType.Retro)
+				particles.Update (elapsed);
 		}
 		bool leftPressed;
 		private void updateFromAccelerometer (GameTime gameTime, TouchCollection touchState)
 		{
+			//PAUSE
+			
+			
+			GamePadState gamepastatus = GamePad.GetState (PlayerIndex.One);
+			if (gamepastatus.Buttons.B == ButtonState.Pressed) {
+				ScreenManager.GlobalPause ();
+				return;
+			}
+			
 			//gameTime.
 			var accelState = Accelerometer.GetState ().Acceleration;
 			
@@ -320,7 +340,7 @@ namespace AsteroidsHD
 			bool rightSideTouched = false;
 			foreach (var touch in touchState) {
 				if (touch.State != TouchLocationState.Released || touch.State != TouchLocationState.Invalid) {
-					if (touch.Position.X < halfScreen)
+					if (touch.Position.X / ScreenManager.Scale < halfScreen)
 						leftSideTouched = true;
 					else
 						rightSideTouched = true;
@@ -337,6 +357,7 @@ namespace AsteroidsHD
 			
 			LeftSideTouchedOld = leftSideTouched;
 			RightSideTouchedOld = rightSideTouched;
+			
 			
 		}
 
@@ -379,11 +400,11 @@ namespace AsteroidsHD
 					allDead = false;
 			}
 			
-			if (allDead) {			
+			if (allDead) {
 				level++;
 				asteroids.Clear ();
 				CreateAsteroids ();
-				bullets.Clear ();	
+				bullets.Clear ();
 			}
 			
 		}
@@ -528,16 +549,16 @@ namespace AsteroidsHD
 				if (a.Alive && CheckShipCollision (a)) {
 					GamePad.SetVibration (PlayerIndex.One, 1f, 1f);
 					if (soundEnabled)
-						playerDied.Play();
-					
-                    particles.CreatePlayerExplosion(new Vector2(a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
+						playerDied.Play ();
+					if (gameType != GameType.Retro)
+						particles.CreatePlayerExplosion (new Vector2 (a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					a.Kill ();
 					lives--;
-					invinisbleTimeLeft = 5;
+					invinisbleTimeLeft = invinsibleResetTime;
 					shipResetSeconds = gameTime.TotalRealTime.TotalSeconds;
+					//Console.WriteLine ("shipResetSeconds: " + shipResetSeconds);
 					SetupShip ();
-					if (lives < 1)
-					{
+					if (lives < 1) {
 						GameOver = true;
 					}
 				}
@@ -545,30 +566,32 @@ namespace AsteroidsHD
 			
 		}
 
-        private bool CheckShipCollision(Sprite asteroid)
-        {
-            Vector2 position1 = asteroid.Position;
-            Vector2 position2 = ship.Position;
-
-            float Cathetus1 = Math.Abs(position1.X - position2.X);
-            float Cathetus2 = Math.Abs(position1.Y - position2.Y);
-
-            Cathetus1 *= Cathetus1;
-            Cathetus2 *= Cathetus2;
-
-            distance = (float)Math.Sqrt(Cathetus1 + Cathetus2);
+		private bool CheckShipCollision (Sprite asteroid)
+		{
+			if (invinisbleTimeLeft > 0)
+				return false;
+			Vector2 position1 = asteroid.Position;
+			Vector2 position2 = ship.Position;
+			
+			float Cathetus1 = Math.Abs (position1.X - position2.X);
+			float Cathetus2 = Math.Abs (position1.Y - position2.Y);
+			
+			Cathetus1 *= Cathetus1;
+			Cathetus2 *= Cathetus2;
+			
+			distance = (float)Math.Sqrt (Cathetus1 + Cathetus2);
 			
 			//Console.WriteLine("Asteroid:" + asteroid.Center + "," + asteroid.Width + "," + asteroid.Height);
 			//Console.WriteLine("Ship:" + position2 + "," + ship.Width + "," + ship.Height);
 			//Console.WriteLine("Distance:" + distance);
 			var width = ship.Width;
-			if(asteroid.Width > ship.Width)
+			if (asteroid.Width > ship.Width)
 				width += (asteroid.Width - ship.Width) / 2;
-            if ((int)distance < width)
-                return true;
-
-            return false;
-        }
+			if ((int)distance < width)
+				return true;
+			
+			return false;
+		}
 
 		private bool CheckAsteroidCollision (Sprite asteroid, Sprite bullet)
 		{
@@ -585,12 +608,10 @@ namespace AsteroidsHD
 			
 			//if(asteroid == asteroids[0])
 			//	Console.WriteLine(distance + " : " + asteroid.Width);
-			if( (int)distance < asteroid.Width/2)
-			{
+			if ((int)distance < asteroid.Width / 2) {
 				//Console.WriteLine(distance + "," + asteroid.Width + " : " + asteroid.Position + "," + bullet.Position);
 				return true;
-			}
-			else
+			} else
 				return false;
 		}
 		private float bulletMaxDistance = -1;
@@ -634,10 +655,11 @@ namespace AsteroidsHD
 						a.Kill ();
 						destroyed.Add (a);
 						b.Kill ();
-						if(soundEnabled)
-							alienDied.Play();
+						if (soundEnabled)
+							alienDied.Play ();
 						
-						particles.CreateAlienExplosion(new Vector2(a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
+						if (gameType != GameType.Retro)
+							particles.CreateAlienExplosion (new Vector2 (a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					}
 				}
 				
@@ -733,8 +755,8 @@ namespace AsteroidsHD
 			newBullet.Create ();
 			
 			bullets.Add (newBullet);
-			if(soundEnabled)
-				playerFired.Play();
+			if (soundEnabled)
+				playerFired.Play ();
 		}
 
 		/// <summary>
@@ -746,15 +768,15 @@ namespace AsteroidsHD
 			
 			ScreenManager.GraphicsDevice.Clear (Color.Black);
 			
-            //ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
-            //                                   Color.CornflowerBlue, 0, 0);
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+			//ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
+			//                                   Color.CornflowerBlue, 0, 0);
+			SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 			Matrix _view = Matrix.CreateScale (ScreenManager.Scale);
-		
+			
 			
 			//spriteBatch.Begin (SpriteSortMode.Deferred, null, null, null, null, null, _view);
 			
-			spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, _view);
+			spriteBatch.Begin (SpriteSortMode.Deferred, null, null, null, null, null, _view);
 			//spriteBatch.Begin();
 			Vector2 position = new Vector2 (10, 10);
 			
@@ -767,9 +789,9 @@ namespace AsteroidsHD
 				
 				spriteBatch.Draw (ship.StandardTexture, shipRect, Color.White);
 			}
-			
-			
-			spriteBatch.Draw (ship.Texture, ship.Position, null, Color.White, ship.Rotation, ship.Center, ship.Scale, SpriteEffects.None, 1.0f);
+			//if invinsible show every other second
+			if (invinisbleTimeLeft <= 0 || (int)(invinisbleTimeLeft * 10) % 2 == 1)
+				spriteBatch.Draw (ship.Texture, ship.Position, null, Color.White, ship.Rotation, ship.Center, ship.Scale, SpriteEffects.None, 1.0f);
 			
 			foreach (Sprite b in bullets) {
 				if (b.Alive) {
@@ -786,14 +808,16 @@ namespace AsteroidsHD
 				}
 			}
 			
-			if (!useAccel)
-				GamePad.Draw (gameTime, spriteBatch);
+			//if (!useAccel)
+			GamePad.Draw (gameTime, spriteBatch);
 			
-			particles.Draw();
+			if (gameType != GameType.Retro)
+				particles.Draw ();
 			spriteBatch.End ();
 			
-            if (TransitionPosition > 0)
-                ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
+			if (TransitionPosition > 0)
+				ScreenManager.FadeBackBufferToBlack (255 - TransitionAlpha);
+		}
 			/*
 			//GL.Viewport (0, 0, Size.Width, Size.Height);
 				
@@ -830,8 +854,7 @@ namespace AsteroidsHD
 			*/			
 			
 			//base.Draw (gameTime);
-		}
-
-
-	}
+		
+		
+			}
 }

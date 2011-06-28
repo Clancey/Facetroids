@@ -71,8 +71,8 @@ namespace AsteroidsHD
                                 params GameScreen[] screensToLoad)
         {
             // Tell all the current screens to transition off.
-            //foreach (GameScreen screen in screenManager.GetScreens())
-            //    screen.ExitScreen();
+            foreach (GameScreen screen in screenManager.GetScreens())
+                screen.ExitScreen();
 
             // Create and activate the loading screen.
             LoadingScreen loadingScreen = new LoadingScreen(screenManager,
@@ -98,8 +98,8 @@ namespace AsteroidsHD
 
             // If all the previous screens have finished transitioning
             // off, it is time to actually perform the load.
-           // if (otherScreensAreGone)
-            //{
+            if (otherScreensAreGone)
+            {
                 ScreenManager.RemoveScreen(this);
 
                 foreach (GameScreen screen in screensToLoad)
@@ -114,7 +114,7 @@ namespace AsteroidsHD
                 // the  game timing mechanism that we have just finished a very
                 // long frame, and that it should not try to catch up.
                 ScreenManager.Game.ResetElapsedTime();
-            //}
+            }
         }
 
 
@@ -151,7 +151,8 @@ namespace AsteroidsHD
                 Vector2 viewportSize = new Vector2(ScreenManager.Width, ScreenManager.Height);
                 Vector2 textSize = font.MeasureString(message);
                 Vector2 textPosition = (viewportSize - textSize) / 2;
-
+				//Console.WriteLine("Text Size:" + textSize);
+				//Console.WriteLine("Text position:" + textPosition);
                 Color color = new Color(255, 255, 255, TransitionAlpha);
 
                 // Draw the text.

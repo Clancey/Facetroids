@@ -148,7 +148,8 @@
     <Compile Include="..\..\ClanceysLib\ClanceysLib\UIControls\MBProgressHUD.cs">
       <Link>ClanceyLib\MBProgressHUD.cs</Link>
     </Compile>
-    <Compile Include="Game1.cs" />
+    <Compile Include="Screens\QuitMenu.cs" />
+    <Compile Include="Screens\ContinueMenuScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\background.png" />
@@ -178,7 +179,6 @@
     <Content Include="Content\gamefont.xnb" />
     <Content Include="Content\menufont.xnb" />
     <Content Include="Content\gradient.png" />
-    <Content Include="IMG_0540.jpg" />
     <Content Include="Content\Alien_Hit.wav" />
     <Content Include="Content\Player_Hit.wav" />
     <Content Include="Content\Tank_Fire.wav" />
@@ -187,6 +187,7 @@
     <Content Include="Content\PrimaryBackground.png" />
     <Content Include="Content\fire.png" />
     <Content Include="Content\smoke.png" />
+    <Content Include="Content\pause.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">

@@ -17,137 +17,121 @@ using Microsoft.Xna.Framework;
 
 namespace AsteroidsHD
 {
-    /// <summary>
-    /// The options screen is brought up over the top of the main menu
-    /// screen, and gives the user a chance to configure the game
-    /// in various hopefully useful ways.
-    /// </summary>
-    class OptionsMenuScreen : MenuScreen
-    {
-        #region Fields
+	/// <summary>
+	/// The options screen is brought up over the top of the main menu
+	/// screen, and gives the user a chance to configure the game
+	/// in various hopefully useful ways.
+	/// </summary>
+	class OptionsMenuScreen : MenuScreen
+	{
+		#region Fields
 
-        MenuEntry ungulateMenuEntry;
-        MenuEntry languageMenuEntry;
-        MenuEntry frobnicateMenuEntry;
-        MenuEntry elfMenuEntry;
+		MenuEntry gameTypeMenu;
+		//MenuEntry languageMenuEntry;
+		//MenuEntry frobnicateMenuEntry;
+		//MenuEntry elfMenuEntry;
 
-        enum Ungulate
-        {
-            BactrianCamel,
-            Dromedary,
-            Llama,
-        }
+		#endregion
 
-        static Ungulate currentUngulate = Ungulate.Dromedary;
-
-        static string[] languages = { "C#", "French", "Deoxyribonucleic acid" };
-        static int currentLanguage = 0;
-
-        static bool frobnicate = true;
-
-        static int elf = 23;
-
-        #endregion
-
-        #region Initialization
+		#region Initialization
 
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public OptionsMenuScreen()
-            : base("Options")
-        {
-            // Create our menu entries.
-            ungulateMenuEntry = new MenuEntry(string.Empty);
-            languageMenuEntry = new MenuEntry(string.Empty);
-            frobnicateMenuEntry = new MenuEntry(string.Empty);
-            elfMenuEntry = new MenuEntry(string.Empty);
-
-            SetMenuEntryText();
-
-            MenuEntry backMenuEntry = new MenuEntry("Back");
-
-            // Hook up menu event handlers.
-            ungulateMenuEntry.Selected += UngulateMenuEntrySelected;
-            languageMenuEntry.Selected += LanguageMenuEntrySelected;
-            frobnicateMenuEntry.Selected += FrobnicateMenuEntrySelected;
-            elfMenuEntry.Selected += ElfMenuEntrySelected;
-            backMenuEntry.Selected += OnCancel;
-            
-            // Add entries to the menu.
-            MenuEntries.Add(ungulateMenuEntry);
-            MenuEntries.Add(languageMenuEntry);
-            MenuEntries.Add(frobnicateMenuEntry);
-            MenuEntries.Add(elfMenuEntry);
-            MenuEntries.Add(backMenuEntry);
-        }
-
-
-        /// <summary>
-        /// Fills in the latest values for the options screen menu text.
-        /// </summary>
-        void SetMenuEntryText()
-        {
-            ungulateMenuEntry.Text = "Preferred ungulate: " + currentUngulate;
-            languageMenuEntry.Text = "Language: " + languages[currentLanguage];
-            frobnicateMenuEntry.Text = "Frobnicate: " + (frobnicate ? "on" : "off");
-            elfMenuEntry.Text = "elf: " + elf;
-        }
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		public OptionsMenuScreen () : base("Options")
+		{
+			// Create our menu entries.
+			gameTypeMenu = new MenuEntry (string.Empty);
+			//languageMenuEntry = new MenuEntry(string.Empty);
+			//frobnicateMenuEntry = new MenuEntry(string.Empty);
+			//elfMenuEntry = new MenuEntry(string.Empty);
+			
+			SetMenuEntryText ();
+			
+			MenuEntry backMenuEntry = new MenuEntry ("Back");
+			
+			// Hook up menu event handlers.
+			gameTypeMenu.Selected += UngulateMenuEntrySelected;
+			//languageMenuEntry.Selected += LanguageMenuEntrySelected;
+			//frobnicateMenuEntry.Selected += FrobnicateMenuEntrySelected;
+			//elfMenuEntry.Selected += ElfMenuEntrySelected;
+			backMenuEntry.Selected += OnCancel;
+			
+			// Add entries to the menu.
+			MenuEntries.Add (gameTypeMenu);
+			//MenuEntries.Add(languageMenuEntry);
+			//MenuEntries.Add(frobnicateMenuEntry);
+			//MenuEntries.Add(elfMenuEntry);
+			MenuEntries.Add (backMenuEntry);
+		}
 
 
-        #endregion
-
-        #region Handle Input
-
-
-        /// <summary>
-        /// Event handler for when the Ungulate menu entry is selected.
-        /// </summary>
-        void UngulateMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-            currentUngulate++;
-
-            if (currentUngulate > Ungulate.Llama)
-                currentUngulate = 0;
-
-            SetMenuEntryText();
-        }
+		/// <summary>
+		/// Fills in the latest values for the options screen menu text.
+		/// </summary>
+		void SetMenuEntryText ()
+		{
+			gameTypeMenu.Text = "Game Type: " + Settings.GameType;
+			//languageMenuEntry.Text = "Language: " + languages[currentLanguage];
+			//frobnicateMenuEntry.Text = "Frobnicate: " + (frobnicate ? "on" : "off");
+			//elfMenuEntry.Text = "elf: " + elf;
+		}
 
 
-        /// <summary>
-        /// Event handler for when the Language menu entry is selected.
-        /// </summary>
-        void LanguageMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-            currentLanguage = (currentLanguage + 1) % languages.Length;
+		#endregion
 
-            SetMenuEntryText();
-        }
+		#region Handle Input
 
 
-        /// <summary>
-        /// Event handler for when the Frobnicate menu entry is selected.
-        /// </summary>
-        void FrobnicateMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-            frobnicate = !frobnicate;
-
-            SetMenuEntryText();
-        }
-
-
-        /// <summary>
-        /// Event handler for when the Elf menu entry is selected.
-        /// </summary>
-        void ElfMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-        {
-            elf++;
-
-            SetMenuEntryText();
-        }
+		/// <summary>
+		/// Event handler for when the Ungulate menu entry is selected.
+		/// </summary>
+		void UngulateMenuEntrySelected (object sender, PlayerIndexEventArgs e)
+		{
+			
+			Settings.GameType++;
+			
+			if (Settings.GameType > GameType.Modern)
+				Settings.GameType = GameType.Facebook;
+			
+			SetMenuEntryText ();
+		}
 
 
-        #endregion
-    }
+		/// <summary>
+		/// Event handler for when the Language menu entry is selected.
+		/// </summary>
+		void LanguageMenuEntrySelected (object sender, PlayerIndexEventArgs e)
+		{
+			//currentLanguage = (currentLanguage + 1) % languages.Length;
+			
+			SetMenuEntryText ();
+		}
+
+
+		/// <summary>
+		/// Event handler for when the Frobnicate menu entry is selected.
+		/// </summary>
+		void FrobnicateMenuEntrySelected (object sender, PlayerIndexEventArgs e)
+		{
+			//frobnicate = !frobnicate;
+			
+			SetMenuEntryText ();
+		}
+
+
+		/// <summary>
+		/// Event handler for when the Elf menu entry is selected.
+		/// </summary>
+		void ElfMenuEntrySelected (object sender, PlayerIndexEventArgs e)
+		{
+			//elf++;
+			
+			SetMenuEntryText ();
+		}
+		
+		
+		#endregion
+	}
 }

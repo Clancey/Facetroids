@@ -151,7 +151,7 @@ namespace MonoTouch.Facebook.Authorization
 				else
 				{
 					var request = webView.Request.MainDocumentURL.ToString();
-					Console.WriteLine("Main Request: " + request);
+					//Console.WriteLine("Main Request: " + request);
 					if(request.Contains("error_reason") && !request.Contains("redirect_uri"))
 					{
 						if(Canceled != null)

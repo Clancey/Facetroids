@@ -104,7 +104,7 @@ namespace AsteroidsHD
 				{
 					UpdatedImage(jid.ToString ());
 				}
-				Console.WriteLine (juser.ToString ());
+				//Console.WriteLine (juser.ToString ());
 			}
 			
 			return new List<Friend> ();
