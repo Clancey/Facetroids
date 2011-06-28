@@ -2,6 +2,7 @@
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.Facebook.Authorization;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace AsteroidsHD
 {
@@ -18,6 +19,9 @@ namespace AsteroidsHD
 			//DataAccess.GetFriends();
 			//FaceDetection.DetectFaces();
 			UIApplication.SharedApplication.ApplicationSupportsShakeToEdit = true;
+			//var gc = new GamerServicesComponent(game);
+			if(Util.CanUseGameCenter)
+				Guide.ShowSignIn(1,false);
 		}
 
 		static void Main (string [] args)
@@ -29,5 +33,7 @@ namespace AsteroidsHD
 		{
 			game.ScreenManager.GlobalPause();
 		}
+		
+	
 	}
 }

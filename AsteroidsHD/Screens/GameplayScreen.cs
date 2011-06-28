@@ -95,11 +95,9 @@ namespace AsteroidsHD
 		/// </summary>
 		public GameplayScreen ()
 		{
-			
 			TransitionOnTime = TimeSpan.FromSeconds (1.5);
 			TransitionOffTime = TimeSpan.FromSeconds (0.5);
 			ShouldPause = true;
-			
 		}
 
 

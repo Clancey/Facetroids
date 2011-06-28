@@ -153,7 +153,7 @@ namespace AsteroidsHD
         /// </summary>
         protected virtual void OnSelectEntry(int entryIndex, PlayerIndex playerIndex)
         {
-            menuEntries[selectedEntry].OnSelectEntry(playerIndex);
+            menuEntries[entryIndex].OnSelectEntry(playerIndex);
         }
 
 

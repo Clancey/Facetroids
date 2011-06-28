@@ -146,9 +146,9 @@ namespace AsteroidsHD
 
             spriteBatch.DrawString(font, text, position, color, 0,
                                    Offset, scale, SpriteEffects.None, 0);
+			
 			Frame = new Rectangle((int)(position.X - (Offset.X * globalScale)),(int)position.Y,
-			                      (int)((fontSize.X + screen.ScreenManager.Font.Spacing) * globalScale),
-			                      (int)screen.ScreenManager.Font.LineSpacing);
+			                      (int)(fontSize.X * globalScale),(int)(fontSize.Y * globalScale));
         }
 
 
@@ -157,7 +157,7 @@ namespace AsteroidsHD
         /// </summary>
         public virtual int GetHeight(MenuScreen screen)
         {
-            return (int)(screen.ScreenManager.Font.LineSpacing * globalScale);
+            return  (int)(screen.ScreenManager.Font.LineSpacing * globalScale);
         }
 
 

@@ -1,6 +1,8 @@
 using System;
 using MonoTouch.UIKit;
 using System.IO;
+using MonoTouch.GameKit;
+using Microsoft.Xna.Framework.GamerServices;
 namespace AsteroidsHD
 {
 	public static class Util
@@ -10,6 +12,18 @@ namespace AsteroidsHD
 		}
 		
 		public static readonly string BaseDir = Directory.GetParent(Environment.GetFolderPath (Environment.SpecialFolder.Personal)).ToString();
+			
+		public static bool CanUseGameCenter
+		{
+			get{
+				var iosVersion = double.Parse(UIDevice.CurrentDevice.SystemVersion);
+				if(iosVersion < 4.1)
+					return false;
+				
+				return iosVersion > 4.1;
+					
+			}
+		}
 	}
 }
 

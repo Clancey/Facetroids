@@ -12,8 +12,9 @@
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <SupportedDevices>IPhoneAndIPad</SupportedDevices>
-    <BundleIdentifier>Faceteroids</BundleIdentifier>
+    <BundleIdentifier>com.youriisolutions.faceteroids</BundleIdentifier>
     <BundleDisplayName>Faceteroids</BundleDisplayName>
+    <BundleVersion>1.0</BundleVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -67,6 +68,7 @@
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchI18n />
     <AssemblyName>AsteroidsHD</AssemblyName>
+    <CodesignProvision>531CAFEC-988D-4EB5-8CE8-92FC8C921DFF</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -78,7 +80,7 @@
     <MtouchDebug>False</MtouchDebug>
     <MtouchUseThumb>false</MtouchUseThumb>
     <ConsolePause>false</ConsolePause>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: James Clancey (MPFNK7YA6W)</CodesignKey>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <AssemblyName>Faceteroids</AssemblyName>
@@ -89,10 +91,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
-    <Reference Include="ios5, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\ios5Bindings\src\ios5.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Json" />
