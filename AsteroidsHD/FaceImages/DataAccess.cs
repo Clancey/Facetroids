@@ -118,6 +118,17 @@ namespace AsteroidsHD
 				string jid = jentry["id"].ToString ();
 				jid = jid.Replace ("\"", "");
 				var imgURl = "http://graph.facebook.com/" + jid.ToString () + "/picture?type=large";
+				
+				lock(Database.Main)
+				{
+					Friend friend = Database.Main.Table<Friend>().Where(x=> x.ID == jid).FirstOrDefault();
+					if(friend == null)
+					{
+						friend = new Friend(){ID = jid,Img = imgURl};
+						Database.Main.Insert(friend);
+					}
+					
+				}
 				/*
 				if (images.Count >= 30) {
 					lock (locker)
@@ -163,8 +174,8 @@ namespace AsteroidsHD
 					face.Cx = photo.width * ((tag.center.x) / 100);
 					face.Cy = photo.height * ((tag.center.y) / 100);
 					face.Roll = tag.roll;
-					//lock (Database.Main)
-					//	Database.Main.Insert (face);
+					lock (Database.Main)
+						Database.Main.Insert (face);
 					Graphics.SaveFace (face);
 					count++;
 					

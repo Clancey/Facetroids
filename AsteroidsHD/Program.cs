@@ -24,7 +24,7 @@ namespace AsteroidsHD
 
 			if(Settings.IsFirstRun)
 			{
-				Settings.Sensativity = .5f;
+				Settings.Sensativity = .56f;
 				Settings.IsFirstRun = false;
 			}
 			//Guide

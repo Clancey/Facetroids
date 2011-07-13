@@ -7,8 +7,17 @@ namespace AsteroidsHD
 	public class Database : SQLiteConnection {
 		internal Database (string file) : base (file)
 		{
-			CreateTable<Friend> ();
-			CreateTable<Face>();
+			try
+			{
+				CreateTable<Friend> ();
+				CreateTable<Face>();
+			}
+			catch
+			{
+				System.IO.File.Delete ( Util.BaseDir + "/Documents/asteroids.db");
+				CreateTable<Friend> ();
+				CreateTable<Face>();
+			}
 			CreateTable<score>();
 		}
 		

@@ -115,8 +115,6 @@ namespace AsteroidsHD
 			if(!File.Exists(face.OrgImage))
 				return;
 			
-			
-			
 			UIImage image = UIImage.FromFile(face.OrgImage);
 			var path = UIBezierPath.FromOval(new RectangleF(0,0,face.Rect.Width,face.Rect.Height)).CGPath;
 			UIGraphics.BeginImageContext(new SizeF(face.Width,face.Height));

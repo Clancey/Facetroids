@@ -8,14 +8,20 @@ namespace AsteroidsHD
 		public Friend ()
 		{
 		}
+		[PrimaryKey]
+		public int RecordId {get;set;}
 		public string OwnerID {get;set;}
 		public string ID {get;set;}
 		public int HitCount {get;set;}
+		public int KilledByCount {get;set;}
 		public string Img {get;set;}
+		public string DisplayName {get;set;}
 	}
 	
 	public class Face
 	{
+		[PrimaryKey]
+		public int RecordId {get;set;}
 		public string Img {get;set;}
 		public string FriendId {get;set;}
 		public string OrgImage {get;set;}

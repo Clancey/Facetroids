@@ -77,8 +77,8 @@ namespace AsteroidsHD
 		Sprite bullet;
 		List<Sprite> bullets = new List<Sprite> ();
 		Texture2D gamePadTexture,leftButtonTexture,rightButtonTexture,upButtonTexture,pauseButtonTexture;
-		List<Texture2D> asteroidTextures = new List<Texture2D> ();
-		List<Sprite> asteroids = new List<Sprite> ();
+		List<AsteroidTexture> asteroidTextures = new List<AsteroidTexture> ();
+		List<Asteroid> asteroids = new List<Asteroid> ();
 
 		SoundEffect alienFired;
 		SoundEffect alienDied;
@@ -292,23 +292,23 @@ namespace AsteroidsHD
 			//Console.WriteLine(gameType);
 			asteroidTextures.Clear ();
 			if (gameType == GameType.Modern) {
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/asteroid.png", 60, 60));
+				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/asteroid.png"));
 				return;
 			} else if (gameType == GameType.Facebook) {
-				foreach (var img in Facebook.GetImages ()) {
+				foreach (var friendResult in Facebook.GetImages ()) {
 					//Console.WriteLine (img);
-					asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, img, 60, 60));
+					asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice,friendResult.FileName,friendResult.Friend));
 				}
 				return;
 			}
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/large" + i + ".pdf", 60, 60));
+				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/Retro/large" + i + ".pdf"));
 			//60
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/medium" + i + ".pdf", 60, 60));
+				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/Retro/medium" + i + ".pdf"));
 			//45
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/Retro/small" + i + ".pdf", 60, 60));
+				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/Retro/small" + i + ".pdf"));
 			//25
 		}
 
@@ -346,7 +346,13 @@ namespace AsteroidsHD
 				if (GameOver) {
 					asteroids.Clear ();
 					ship.Kill ();
-					Database.Main.Insert(new score((int)score,level,gameType,DateTime.Now));
+					lock(Database.Main)
+					{
+						Database.Main.Insert(new score((int)score,level,gameType,DateTime.Now));
+						foreach(var asteroid in asteroidTextures.Where(a=> a.IsFriend).ToList())
+							Database.Main.Update(asteroid.Friend);
+							
+					}
 					string scoreString = "";
 					if(brokeHighScore)
 					{
@@ -655,8 +661,8 @@ namespace AsteroidsHD
 			for (int i = 0; i < asteroidCount; i++) {
 				int index = random.Next (0, asteroidTextures.Count - 1);
 				
-				Sprite tempSprite = new Sprite (asteroidTextures[index]);
-				asteroids.Add (tempSprite);
+				Asteroid tempAsteroid = new Asteroid (asteroidTextures[index]);
+				asteroids.Add (tempAsteroid);
 				asteroids[i].Index = 1;
 				
 				double xPos = 0;
@@ -698,7 +704,7 @@ namespace AsteroidsHD
 
 		private void UpdateAsteroids (GameTime gameTime)
 		{
-			foreach (Sprite a in asteroids) {
+			foreach (Asteroid a in asteroids) {
 				a.Position += a.Velocity;
 				a.Rotation += a.RotationSpin * .05f;
 				
@@ -728,6 +734,8 @@ namespace AsteroidsHD
 					if (gameType != GameType.Retro)
 						particles.CreatePlayerExplosion (new Vector2 (a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					a.Kill ();
+					if(a.AsteroidTexture.IsFriend)
+						a.AsteroidTexture.Friend.KilledByCount ++;
 					lives--;
 					invinisbleTimeLeft = invinsibleResetTime;
 					shipResetSeconds = gameTime.TotalRealTime.TotalSeconds;
@@ -741,11 +749,11 @@ namespace AsteroidsHD
 			
 		}
 
-		private bool CheckShipCollision (Sprite asteroid)
+		private bool CheckShipCollision (Sprite sprite)
 		{
-			if (invinisbleTimeLeft > 0)
+			if (invinisbleTimeLeft > 0 && sprite is Asteroid)
 				return false;
-			Vector2 position1 = asteroid.Position;
+			Vector2 position1 = sprite.Position;
 			Vector2 position2 = ship.Position;
 			
 			float Cathetus1 = Math.Abs (position1.X - position2.X);
@@ -760,8 +768,8 @@ namespace AsteroidsHD
 			//Console.WriteLine("Ship:" + position2 + "," + ship.Width + "," + ship.Height);
 			//Console.WriteLine("Distance:" + distance);
 			var width = ship.Width;
-			if (asteroid.Width > ship.Width)
-				width += (asteroid.Width - ship.Width) / 2;
+			if (sprite.Width > ship.Width)
+				width += (sprite.Width - ship.Width) / 2;
 			if ((int)distance < width)
 				return true;
 			
@@ -795,7 +803,7 @@ namespace AsteroidsHD
 			score += inScore; 
 			if(score > LocalHighScore)
 			{
-				brokeHighScore = true;
+				brokeHighScore = true; 
 				LocalHighScore = score;
 			}
 			pointsForFreeMan += inScore;
@@ -816,7 +824,7 @@ namespace AsteroidsHD
 		}
 		private void UpdateBullets (GameTime gameTime)
 		{
-			List<Sprite> destroyed = new List<Sprite> ();
+			List<Asteroid> destroyed = new List<Asteroid> ();
 			
 			foreach (Sprite b in bullets) {
 				
@@ -836,7 +844,7 @@ namespace AsteroidsHD
 					b.Position = new Vector2 (b.Position.X, 0);
 				}
 				
-				foreach (Sprite a in asteroids) {
+				foreach (Asteroid a in asteroids) {
 					if (a.Alive && CheckAsteroidCollision (a, b)) {
 						if (a.Index == 1)
 							UpdateScore(20);
@@ -846,6 +854,10 @@ namespace AsteroidsHD
 							UpdateScore(100);
 						
 						a.Kill ();
+						if(a.AsteroidTexture.IsFriend)
+						{
+							a.AsteroidTexture.Friend.HitCount ++;
+						}
 						destroyed.Add (a);
 						b.Kill ();
 						if (Settings.UseSound)
@@ -875,7 +887,7 @@ namespace AsteroidsHD
 				}
 			}
 			
-			foreach (Sprite a in destroyed) {
+			foreach (Asteroid a in destroyed) {
 				SplitAsteroid (a,gameTime);
 			}
 		}
@@ -885,7 +897,7 @@ namespace AsteroidsHD
 			int count = 2;
 			return count;
 		}
-		private void SplitAsteroid (Sprite a,GameTime gameTime)
+		private void SplitAsteroid (Asteroid a,GameTime gameTime)
 		{
 			int splitCount = asteroidSplitCount (a.Index);
 			if (a.Index == 1) {
@@ -914,23 +926,23 @@ namespace AsteroidsHD
 			}
 		}
 
-		private void NewAsteroid (Sprite a, int index)
+		private void NewAsteroid (Asteroid a, int index)
 		{
 			
 			int texIndex = random.Next (0, asteroidTextures.Count - 1);
-			Sprite tempSprite = new Sprite (gameType == GameType.Facebook ? a.Texture : asteroidTextures[texIndex]);
+			Asteroid tempAsteroid = new Asteroid (gameType == GameType.Facebook ? a.AsteroidTexture : asteroidTextures[texIndex]);
 			float scale = index == 2 ? .75f : .42f;
-			tempSprite.Scale *= scale;
+			tempAsteroid.Scale *= scale;
 			//Console.WriteLine(scale);
-			tempSprite.Index = index;
-			tempSprite.Position = a.Position;
-			tempSprite.Velocity = RandomVelocity ();
+			tempAsteroid.Index = index;
+			tempAsteroid.Position = a.Position;
+			tempAsteroid.Velocity = RandomVelocity ();
 			
-			tempSprite.Rotation = (float)random.NextDouble () * MathHelper.Pi * 4 - MathHelper.Pi * 2;
-			tempSprite.RotationSpin = (float)random.NextDouble ();
+			tempAsteroid.Rotation = (float)random.NextDouble () * MathHelper.Pi * 4 - MathHelper.Pi * 2;
+			tempAsteroid.RotationSpin = (float)random.NextDouble ();
 			//Console.WriteLine (tempSprite.Rotation);
-			tempSprite.Create ();
-			asteroids.Add (tempSprite);
+			tempAsteroid.Create ();
+			asteroids.Add (tempAsteroid);
 		}
 
 		private Vector2 RandomVelocity ()

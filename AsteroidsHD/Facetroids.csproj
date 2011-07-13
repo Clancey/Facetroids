@@ -112,10 +112,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Sprite.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Extender.cs" />
-    <Compile Include="Ship.cs" />
     <Compile Include="FaceImages\Constants.cs" />
     <Compile Include="3dObj\ObjModel.cs" />
     <Compile Include="3dObj\ObjModelLoader.cs" />
@@ -158,6 +156,11 @@
     <Compile Include="Screens\InstructionsScreen.cs" />
     <Compile Include="Screens\Slider.cs" />
     <Compile Include="Screens\SliderMenuEntry.cs" />
+    <Compile Include="Models\AsteroidTexture.cs" />
+    <Compile Include="Models\Asteroid.cs" />
+    <Compile Include="Models\FriendResult.cs" />
+    <Compile Include="Models\Ship.cs" />
+    <Compile Include="Models\Sprite.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\background.png" />
