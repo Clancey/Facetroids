@@ -29,6 +29,32 @@ namespace AsteroidsHD
 			set{prefs.SetInt((int)value,"gameType");}
 		}
 		
+		public static int HighScore
+		{
+			get{return prefs.IntForKey("highScore");}
+			set{prefs.SetInt(value,"highScore");}
+		}
+		
+		public static bool UseAccel {
+			get{return !prefs.BoolForKey("useAccel");}
+			set{prefs.SetBool(!value,"useAccel");}
+		}
+		
+		public static float Sensativity {
+			get{return prefs.FloatForKey("sensitivity");}
+			set{prefs.SetFloat(value,"sensitivity");}
+		}
+		public static bool IsFirstRun {			
+			get{return !prefs.BoolForKey("isFirtRun");}
+			set{prefs.SetBool(!value,"isFirtRun");}
+		}
+		
+		
+		public static bool UseSound {			
+			get{return !prefs.BoolForKey("useSound");}
+			set{prefs.SetBool(!value,"useSound");}
+		}
+		
 		
 		
 	}

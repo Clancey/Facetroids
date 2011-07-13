@@ -42,6 +42,8 @@ namespace AsteroidsHD
 	/// </summary>
 	class GameplayScreen : GameScreen
 	{
+		
+		bool hasAsteroids = true;
 		#region Fields
 		ContentManager Content;
 		Ship ship;
@@ -49,23 +51,32 @@ namespace AsteroidsHD
 
 		int ScreenWidth, ScreenHeight;
 		int level = 1;
-		int score = 0;
+		long score = 0;
 		int lives;
 		//float scale;
-		bool useAccel = true;
+		bool useAccel;
 		GameType gameType = GameType.Facebook;
-		bool soundEnabled = true;
 		double invinisbleTimeLeft = 0;
 		double shipResetSeconds = 0;
 		double invinsibleResetTime = 3;
-
+		long LocalHighScore = 0 ;
+		bool brokeHighScore = false;
 		int baseAsteroids = Util.IsIpad ? 5 : 3;
+		const int freeManPoints = 10000;
+		int pointsForFreeMan = 0;
+		
+		bool isFreeManVisible = false;
+		Sprite freeManSprite;
+		double freeManResetTime = 10;
+		double freeManBlinkTime = 4;
+		double freeManVisibleTimeLeft = 0;
+		double freeManResetSeconds = 0;
 
 		KeyboardState oldState;
 
 		Sprite bullet;
 		List<Sprite> bullets = new List<Sprite> ();
-		Texture2D gamePadTexture;
+		Texture2D gamePadTexture,leftButtonTexture,rightButtonTexture,upButtonTexture,pauseButtonTexture;
 		List<Texture2D> asteroidTextures = new List<Texture2D> ();
 		List<Sprite> asteroids = new List<Sprite> ();
 
@@ -129,14 +140,22 @@ namespace AsteroidsHD
 
 		private void SetupGame ()
 		{
+			brokeHighScore = false;
 			level = 1;
 			score = 0;
+			pointsForFreeMan = 0;
 			lives = 3;
+			bullets.Clear ();
+			LocalHighScore = Settings.HighScore;
 			ScreenHeight = (int)UIScreen.MainScreen.Bounds.Width;
 			ScreenWidth = (int)UIScreen.MainScreen.Bounds.Height;
 			SetupShip ();
 			CreateAsteroids ();
+			invinisbleTimeLeft = -1;
 			GameOver = false;
+			isFreeManVisible = false;
+			if(particles != null)
+				particles.Reset();
 		}
 
 
@@ -157,19 +176,20 @@ namespace AsteroidsHD
 			ScreenWidth = ScreenManager.Width;
 			ScreenHeight = ScreenManager.Height;
 			gameType = Settings.GameType;
+			useAccel = Settings.UseAccel;
 			if (Content == null)
 				Content = new ContentManager (ScreenManager.Game.Services, "Content");
 			// Create a new SpriteBatch, which can be used to draw textures.
 			//spriteBatch = ScreenManager.SpriteBatch;
 			//AwesomeAsteroid = ObjModelLoader.LoadFromFile ("Models/rock.obj");
 			//asteroid = Texture2D.FromFile (ScreenManager.GraphicsDevice, "Models/rock.jpg", 256, 256);
-			
-			gamePadTexture = Content.Load<Texture2D> ("pause.png");
+			pauseButtonTexture = Content.Load<Texture2D>("pause.png");
 			var ship1t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship.pdf";
 			var ship2t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship-thrust.pdf";
 			var ship1 = Texture2D.FromFile (ScreenManager.GraphicsDevice, ship1t, 35, 35);
 			var ship2 = Texture2D.FromFile (ScreenManager.GraphicsDevice, ship2t, 35, 35);
 			ship = new Ship (ship1, ship2);
+			freeManSprite = new Sprite(ship2);
 			//ship.Scale = .05f;
 			bullet = new Sprite (Content.Load<Texture2D> ("shot-frame1"));
 			//bullet.Scale = .05f;
@@ -182,35 +202,83 @@ namespace AsteroidsHD
 			playerFired = ScreenManager.Game.Content.Load<SoundEffect> ("fire");
 			playerDied = ScreenManager.Game.Content.Load<SoundEffect> ("Player_Hit");
 			
-			var gamePadH = 0 + 10;
-			var gamePadLeft = ScreenWidth - 80;
 			//Console.WriteLine (gamePadLeft);
 			// Set the virtual GamePad
-			ButtonDefinition BButton = new ButtonDefinition ();
-			BButton.Texture = gamePadTexture;
-			BButton.Position = new Vector2 (gamePadLeft, gamePadH);
-			BButton.Type = Buttons.B;
-			BButton.TextureRect = new Rectangle (0, 0, 30, 30);
+			GamePad.ButtonsDefinitions.Clear();
+			var gamePadH = ScreenHeight - 100;
+			var gamePadLeft = ScreenWidth -80;
 			
-			GamePad.ButtonsDefinitions.Add (BButton);
-			/*
-			ButtonDefinition AButton = new ButtonDefinition ();
-			AButton.Texture = gamePadTexture;
-			AButton.Position = new Vector2 (gamePadLeft - 75, gamePadH + 10);
-			AButton.Type = Buttons.A;
-			AButton.TextureRect = new Rectangle (73, 114, 36, 36);
-			*/			
-			
-			//GamePad.ButtonsDefinitions.Add (AButton);
-			
-			//ThumbStickDefinition thumbStick = new ThumbStickDefinition ();
-			//thumbStick.Position = new Vector2 (50, gamePadH);
-			//thumbStick.Texture = gamePadTexture;
-			//thumbStick.TextureRect = new Rectangle (2, 2, 68, 68);
+			ButtonDefinition XButton = new ButtonDefinition ();
+			XButton.Texture = pauseButtonTexture;
+			XButton.Position = new Vector2 (gamePadLeft, 0 + 10 + (int)myFont.FontSize + 10);
+			XButton.Type = Buttons.X;
+			XButton.TextureRect = new Rectangle (0, 0, 30, 30);	
+			GamePad.ButtonsDefinitions.Add (XButton);
 			
 			
-			//GamePad.LeftThumbStickDefinition = thumbStick;
+			if(!useAccel)
+			{
+				//Setup the controller if they are not using the accelerometer
+				gamePadTexture = Content.Load<Texture2D> ("gamepad.png");
+				//leftButtonTexture = Content.Load<Texture2D>("leftArrow.png");
+				//rightButtonTexture = Content.Load<Texture2D>("rightArrow.png");
+				//upButtonTexture = Content.Load<Texture2D>("upArrow.png");
+				//ButtonDefinition left = new ButtonDefinition();
+				//Console.WriteLine (gamePadH);
+				// Set the virtual GamePad
+				/*
+				ButtonDefinition BButton = new ButtonDefinition ();
+				BButton.Texture = gamePadTexture;
+				BButton.Position = new Vector2 (gamePadLeft, gamePadH + 10);
+				BButton.Type = Buttons.B;
+				BButton.TextureRect = new Rectangle (72, 77, 36, 36);
+				
+				ButtonDefinition AButton = new ButtonDefinition ();
+				AButton.Texture = gamePadTexture;
+				AButton.Position = new Vector2 (gamePadLeft - 75, gamePadH + 10);
+				AButton.Type = Buttons.A;
+				AButton.TextureRect = new Rectangle (73, 114, 36, 36);
+				
+				ButtonDefinition LeftButton = new ButtonDefinition();
+				LeftButton.Texture = leftButtonTexture;
+				LeftButton.Position = new Vector2(50,gamePadH);
+				LeftButton.Type = Buttons.DPadLeft;
+				LeftButton.TextureRect = new Rectangle(0,0,40,40);
+				
+				ButtonDefinition RightButton = new ButtonDefinition();
+				RightButton.Texture = rightButtonTexture;
+				RightButton.Position = new Vector2(50 + 40 +4,gamePadH);
+				RightButton.Type = Buttons.DPadRight;
+				RightButton.TextureRect = new Rectangle(0,0,40,40);
+				
+				
+				ButtonDefinition UpButton = new ButtonDefinition();
+				UpButton.Texture = upButtonTexture;
+				UpButton.Position = new Vector2(50 + 22,gamePadH - 44);
+				UpButton.Type = Buttons.DPadUp;
+				UpButton.TextureRect = new Rectangle(0,0,40,40);
+				
+				GamePad.ButtonsDefinitions.Add(LeftButton);
+				GamePad.ButtonsDefinitions.Add(RightButton);
+				GamePad.ButtonsDefinitions.Add(UpButton);
+				GamePad.ButtonsDefinitions.Add (BButton);
+				GamePad.ButtonsDefinitions.Add (AButton);	
+				*/
+				
 			
+				ThumbStickDefinition thumbStick = new ThumbStickDefinition ();
+				thumbStick.Position = new Vector2 (50, gamePadH);
+				thumbStick.Texture = gamePadTexture;
+				thumbStick.TextureRect = new Rectangle (2, 2, 68, 68);
+				
+				
+				GamePad.LeftThumbStickDefinition = thumbStick;
+				
+			}
+			else
+			{
+				GamePad.LeftThumbStickDefinition = null;	
+			}
 			SetupGame ();
 			
 			if (gameType != GameType.Retro)
@@ -224,7 +292,7 @@ namespace AsteroidsHD
 			//Console.WriteLine(gameType);
 			asteroidTextures.Clear ();
 			if (gameType == GameType.Modern) {
-				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/asteroid-front.pdf", 60, 60));
+				asteroidTextures.Add (Texture2D.FromFile (ScreenManager.GraphicsDevice, "Content/asteroid.png", 60, 60));
 				return;
 			} else if (gameType == GameType.Facebook) {
 				foreach (var img in Facebook.GetImages ()) {
@@ -278,28 +346,50 @@ namespace AsteroidsHD
 				if (GameOver) {
 					asteroids.Clear ();
 					ship.Kill ();
-					ContinueMenuScreen cont = new ContinueMenuScreen ();
+					Database.Main.Insert(new score((int)score,level,gameType,DateTime.Now));
+					string scoreString = "";
+					if(brokeHighScore)
+					{
+						Settings.HighScore = (int)score;
+						scoreString = "New High Score: " + score;
+					}
+					else
+						scoreString = "Score: " + score;
+					
+					ContinueMenuScreen cont = new ContinueMenuScreen (scoreString);					
 					cont.Continue += delegate { SetupGame (); };
 					ScreenManager.AddScreen (cont, ControllingPlayer);
+					Util.SubmitScores();
 					return;
 					
 				}
-				
-				
-				if (useAccel)
-					updateFromAccelerometer (gameTime, touchState);
+							
+				GamePadState gamepastatus = GamePad.GetState (PlayerIndex.One);
+				if (gamepastatus.Buttons.X == ButtonState.Pressed) {
+					ScreenManager.GlobalPause ();
+					return;
+				}
 				else
-					updateFromGamePad (gameTime);
-				
-				
+				{
+					if (useAccel)
+						updateFromAccelerometer (gameTime, touchState);
+					else
+						updateFromGamePad (gameTime,touchState);
+				}
 				//Console.WriteLine(invinisbleTimeLeft);
 				if (invinisbleTimeLeft > 0) {
 					invinisbleTimeLeft = invinsibleResetTime - (gameTime.TotalRealTime.TotalSeconds - shipResetSeconds);
 					//Console.WriteLine ("invinisbleTimeLeft: " + invinisbleTimeLeft);
 				}
+				
+				if(freeManVisibleTimeLeft > 0)
+					freeManVisibleTimeLeft = freeManResetTime - (gameTime.TotalRealTime.TotalSeconds - freeManResetSeconds);
+				else 
+					isFreeManVisible = false;
+				
 				UpdateShip ();
 				UpdateAsteroids (gameTime);
-				UpdateBullets ();
+				UpdateBullets (gameTime);
 				AllDead ();
 				
 			}
@@ -310,23 +400,20 @@ namespace AsteroidsHD
 				particles.Update (elapsed);
 		}
 		bool leftPressed;
+		double lastAutoShotFired;
+		const double autoShootTime = 333;
 		private void updateFromAccelerometer (GameTime gameTime, TouchCollection touchState)
 		{
 			//PAUSE
 			
-			
-			GamePadState gamepastatus = GamePad.GetState (PlayerIndex.One);
-			if (gamepastatus.Buttons.B == ButtonState.Pressed) {
-				ScreenManager.GlobalPause ();
-				return;
-			}
+
 			
 			//gameTime.
 			var accelState = Accelerometer.GetState ().Acceleration;
 			
 			var position = new Vector2 (0, 0);
 			//if(Math.Abs(accelState.Y) > .1f)
-			position.X = accelState.Y * 4 * .5f;
+			position.X = accelState.Y * 4 * Settings.Sensativity;
 			
 			if (this.ScreenManager.GraphicsDevice.PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
 				position.X *= -1;
@@ -344,9 +431,18 @@ namespace AsteroidsHD
 						rightSideTouched = true;
 				}
 			}
-			
+			var diff = gameTime.TotalGameTime.TotalMilliseconds - lastAutoShotFired ;
+			//Console.WriteLine(diff);
 			if (!RightSideTouchedOld && rightSideTouched)
+			{
 				FireBullet ();
+				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
+			}
+			else if(rightSideTouched && diff >= autoShootTime)
+			{
+				FireBullet();
+				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
+			}
 			
 			if (leftSideTouched)
 				AccelerateShip ();
@@ -358,20 +454,77 @@ namespace AsteroidsHD
 			
 			
 		}
-
-		private void updateFromGamePad (GameTime gameTime)
+		
+		private static float WrapAngle(float radians) 
+		{ 
+		    while (radians < -MathHelper.Pi) 
+		    { 
+		        radians += MathHelper.TwoPi; 
+		    } 
+		    while (radians > MathHelper.Pi) 
+		    { 
+		        radians -= MathHelper.TwoPi; 
+		    } 
+		    return radians; 
+		} 
+		private void updateFromGamePad (GameTime gameTime, TouchCollection touchState)
 		{
+			float tollerance = .95f;
 			GamePadState gamepastatus = GamePad.GetState (PlayerIndex.One);
 			var position = new Vector2 (0, 0);
-			position.Y += (int)(gamepastatus.ThumbSticks.Left.Y * -4);
-			position.X += (int)(gamepastatus.ThumbSticks.Left.X * 4);
+			//if(gamepastatus.ThumbSticks.Left.Y > tollerance)
 			
-			ship.Rotation -= 0.05f * position.X;
+			//if (gamepastatus.ThumbSticks.Left.Y < tollerance)
+			position.X += (int)(gamepastatus.ThumbSticks.Left.X  * 4 * Settings.Sensativity);	
 			
-			if (gamepastatus.Buttons.B == ButtonState.Pressed && oldGamePadState.Buttons.B == ButtonState.Released)
+			//ship.Rotation -= 0.05f * position.X;
+			var maxJoyStick = Math.Max(Math.Abs(gamepastatus.ThumbSticks.Left.Y),Math.Abs(gamepastatus.ThumbSticks.Left.X));
+			var rotation = (float)Math.Atan2((double)gamepastatus.ThumbSticks.Left.X,(double)gamepastatus.ThumbSticks.Left.Y);
+			if(maxJoyStick > 0.1f )
+			{
+				
+				var rotationSpeed = 0.2f * Settings.Sensativity;
+				float difference = WrapAngle(rotation - ship.Rotation); 
+ 
+				// clamp that between -turnSpeed and turnSpeed. 
+				difference = MathHelper.Clamp(difference, -rotationSpeed, rotationSpeed); 
+				
+				// so, the closest we can get to our target is currentAngle + difference. 
+				// return that, using WrapAngle again. 
+				ship.Rotation = WrapAngle(ship.Rotation + difference); 
+
+			}
+			
+			var halfScreen = ScreenWidth / 2;
+			bool leftSideTouched = false;
+			bool rightSideTouched = false;
+			foreach (var touch in touchState) {
+				if (touch.State != TouchLocationState.Released || touch.State != TouchLocationState.Invalid) {
+					if (touch.Position.X / ScreenManager.Scale < halfScreen)
+						leftSideTouched = true;
+					else
+						rightSideTouched = true;
+				}
+			}
+			
+			var diff = gameTime.TotalGameTime.TotalMilliseconds - lastAutoShotFired ;
+			//Console.WriteLine(diff);
+			if (!RightSideTouchedOld && rightSideTouched)
+			{
 				FireBullet ();
+				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
+			}
+			else if(rightSideTouched && diff >= autoShootTime)
+			{
+				FireBullet();
+				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
+			}
 			
-			if (position.Y < 0)
+			
+			//if (gamepastatus.Buttons.B == ButtonState.Pressed && oldGamePadState.Buttons.B == ButtonState.Released)
+			//	FireBullet ();
+			
+			if (maxJoyStick > tollerance)
 				AccelerateShip ();
 			else
 				DecelerateShip ();
@@ -387,19 +540,22 @@ namespace AsteroidsHD
 			
 			//oldState = newState;
 			oldGamePadState = gamepastatus;
+			RightSideTouchedOld = rightSideTouched;
 		}
 
 		private void AllDead ()
 		{
 			bool allDead = true;
-			
 			foreach (Sprite s in asteroids) {
 				if (s.Alive)
 					allDead = false;
 			}
 			
+			if(!hasAsteroids)
+				allDead = false;
 			if (allDead) {
 				level++;
+				Util.BackgroundScreen.ChangeColor();
 				asteroids.Clear ();
 				CreateAsteroids ();
 				bullets.Clear ();
@@ -419,47 +575,52 @@ namespace AsteroidsHD
 			
 			ship.Velocity = Vector2.Zero;
 		}
+		const float Friction = 0.09f;
+		const float MaxSpeed = 3f;
 		private void AccelerateShip ()
 		{
 			ship.IsThrusting = true;
-			ship.Velocity += new Vector2 ((float)(Math.Cos (ship.Rotation - MathHelper.PiOver2) * 0.05f), (float)((Math.Sin (ship.Rotation - MathHelper.PiOver2) * 0.05f)));
 			
-			if (ship.Velocity.X > 5.0f) {
-				ship.Velocity = new Vector2 (5.0f, ship.Velocity.Y);
+			ship.Velocity += new Vector2 ((float)(Math.Cos (ship.Rotation - MathHelper.PiOver2) * Friction), (float)((Math.Sin (ship.Rotation - MathHelper.PiOver2) * Friction)));
+			
+			if (ship.Velocity.X > MaxSpeed) {
+				ship.Velocity = new Vector2 (MaxSpeed, ship.Velocity.Y);
 			}
-			if (ship.Velocity.X < -5.0f) {
-				ship.Velocity = new Vector2 (-5.0f, ship.Velocity.Y);
+			if (ship.Velocity.X < -MaxSpeed) {
+				ship.Velocity = new Vector2 (-MaxSpeed, ship.Velocity.Y);
 			}
-			if (ship.Velocity.Y > 5.0f) {
-				ship.Velocity = new Vector2 (ship.Velocity.X, 5.0f);
+			if (ship.Velocity.Y > MaxSpeed) {
+				ship.Velocity = new Vector2 (ship.Velocity.X, MaxSpeed);
 			}
-			if (ship.Velocity.Y < -5.0f) {
-				ship.Velocity = new Vector2 (ship.Velocity.X, -5.0f);
+			if (ship.Velocity.Y < -MaxSpeed) {
+				ship.Velocity = new Vector2 (ship.Velocity.X, -MaxSpeed);
 			}
 		}
-
+		
+		const float dec = 0.03f;
 		private void DecelerateShip ()
 		{
 			ship.IsThrusting = false;
 			if (ship.Velocity.X < 0) {
-				ship.Velocity = new Vector2 (ship.Velocity.X + 0.02f, ship.Velocity.Y);
+				ship.Velocity = new Vector2 (ship.Velocity.X + dec, ship.Velocity.Y);
 			}
 			
 			if (ship.Velocity.X > 0) {
-				ship.Velocity = new Vector2 (ship.Velocity.X - 0.02f, ship.Velocity.Y);
+				ship.Velocity = new Vector2 (ship.Velocity.X - dec, ship.Velocity.Y);
 			}
 			
 			if (ship.Velocity.Y < 0) {
-				ship.Velocity = new Vector2 (ship.Velocity.X, ship.Velocity.Y + 0.02f);
+				ship.Velocity = new Vector2 (ship.Velocity.X, ship.Velocity.Y + dec);
 			}
 			
 			if (ship.Velocity.Y > 0) {
-				ship.Velocity = new Vector2 (ship.Velocity.X, ship.Velocity.Y - 0.02f);
+				ship.Velocity = new Vector2 (ship.Velocity.X, ship.Velocity.Y - dec);
 			}
 		}
 
 		public void UpdateShip ()
 		{
+			Util.BackgroundScreen.Velocity = ship.Velocity;
 			ship.Position += ship.Velocity;
 			
 			if (ship.Position.X + ship.Width < 0) {
@@ -474,10 +635,20 @@ namespace AsteroidsHD
 			if (ship.Position.Y - ship.Height > ScreenHeight) {
 				ship.Position = new Vector2 (ship.Position.X, 0);
 			}
+			if(isFreeManVisible)
+			{
+				if(CheckShipCollision(freeManSprite))
+				{
+					isFreeManVisible = false;
+					lives ++;
+				}
+			}
 		}
 
 		private void CreateAsteroids ()
 		{
+			if(!hasAsteroids)
+				return;
 			int value;
 			var asteroidCount = baseAsteroids + level;
 			//asteroidCount = 1;
@@ -545,8 +716,14 @@ namespace AsteroidsHD
 				}
 				
 				if (a.Alive && CheckShipCollision (a)) {
+					if (a.Index == 1)
+							UpdateScore(20);
+						else if (a.Index == 2)
+							UpdateScore(50);
+						else
+							UpdateScore(100);
 					GamePad.SetVibration (PlayerIndex.One, 1f, 1f);
-					if (soundEnabled)
+					if (Settings.UseSound)
 						playerDied.Play ();
 					if (gameType != GameType.Retro)
 						particles.CreatePlayerExplosion (new Vector2 (a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
@@ -612,6 +789,23 @@ namespace AsteroidsHD
 			} else
 				return false;
 		}
+		
+		private void UpdateScore(int inScore)
+		{
+			score += inScore; 
+			if(score > LocalHighScore)
+			{
+				brokeHighScore = true;
+				LocalHighScore = score;
+			}
+			pointsForFreeMan += inScore;
+			if(pointsForFreeMan >= freeManPoints)
+			{
+				lives ++;
+				pointsForFreeMan = pointsForFreeMan - freeManPoints;
+			}
+		}
+		
 		private float bulletMaxDistance = -1;
 		public float BulletMaxDistance {
 			get {
@@ -620,7 +814,7 @@ namespace AsteroidsHD
 				return bulletMaxDistance;
 			}
 		}
-		private void UpdateBullets ()
+		private void UpdateBullets (GameTime gameTime)
 		{
 			List<Sprite> destroyed = new List<Sprite> ();
 			
@@ -645,15 +839,16 @@ namespace AsteroidsHD
 				foreach (Sprite a in asteroids) {
 					if (a.Alive && CheckAsteroidCollision (a, b)) {
 						if (a.Index == 1)
-							score += 25; else if (a.Index == 2)
-							score += 50;
+							UpdateScore(20);
+						else if (a.Index == 2)
+							UpdateScore(50);
 						else
-							score += 100;
+							UpdateScore(100);
 						
 						a.Kill ();
 						destroyed.Add (a);
 						b.Kill ();
-						if (soundEnabled)
+						if (Settings.UseSound)
 							alienDied.Play ();
 						
 						if (gameType != GameType.Retro)
@@ -681,7 +876,7 @@ namespace AsteroidsHD
 			}
 			
 			foreach (Sprite a in destroyed) {
-				SplitAsteroid (a);
+				SplitAsteroid (a,gameTime);
 			}
 		}
 
@@ -690,7 +885,7 @@ namespace AsteroidsHD
 			int count = 2;
 			return count;
 		}
-		private void SplitAsteroid (Sprite a)
+		private void SplitAsteroid (Sprite a,GameTime gameTime)
 		{
 			int splitCount = asteroidSplitCount (a.Index);
 			if (a.Index == 1) {
@@ -701,6 +896,21 @@ namespace AsteroidsHD
 				for (int i = 0; i < splitCount; i++) {
 					NewAsteroid (a, 3);
 				}
+			}
+			spawnDrops(a.Position,gameTime);
+		}
+		Random spawnRandom = new Random();
+		private void spawnDrops(Vector2 position,GameTime gameTime)
+		{
+			var number = spawnRandom.Next(100);
+			if( number > 95)
+			{
+				if(isFreeManVisible)
+					return;
+				isFreeManVisible = true;
+				freeManSprite.Position = position;
+				freeManVisibleTimeLeft = freeManResetTime;
+				freeManResetSeconds = gameTime.TotalRealTime.TotalSeconds;
 			}
 		}
 
@@ -745,6 +955,7 @@ namespace AsteroidsHD
 			
 			velocity.Normalize ();
 			velocity *= 6.0f;
+			velocity += ship.Velocity;
 			
 			newBullet.Velocity = velocity;
 			
@@ -753,7 +964,7 @@ namespace AsteroidsHD
 			newBullet.Create ();
 			
 			bullets.Add (newBullet);
-			if (soundEnabled)
+			if (Settings.UseSound)
 				playerFired.Play ();
 		}
 
@@ -764,7 +975,7 @@ namespace AsteroidsHD
 		public override void Draw (GameTime gameTime)
 		{
 			
-			ScreenManager.GraphicsDevice.Clear (Color.Black);
+			//ScreenManager.GraphicsDevice.Clear (Color.Black);
 			
 			//ScreenManager.GraphicsDevice.Clear(ClearOptions.Target,
 			//                                   Color.CornflowerBlue, 0, 0);
@@ -780,23 +991,38 @@ namespace AsteroidsHD
 			
 			spriteBatch.DrawString (myFont, "Score = " + score.ToString (), position, Color.White);
 			
-			Rectangle shipRect;
+			var highScoreText = "High Score = " + LocalHighScore;
+			var hSize = myFont.MeasureString(highScoreText);
+			Vector2 highScorePos = new Vector2(ScreenWidth - 10 - hSize.X,10);			
+			spriteBatch.DrawString (myFont, highScoreText, highScorePos, Color.White);
 			
+			Rectangle shipRect;
+			/*
 			for (int i = 0; i < lives; i++) {
 				shipRect = new Rectangle (i * ship.Width + 10, 40, ship.Width, ship.Height);
 				
 				spriteBatch.Draw (ship.StandardTexture, shipRect, Color.White);
 			}
+			*/
+			shipRect = new Rectangle (10, 40, ship.Width, ship.Height);
+			
+			spriteBatch.Draw (ship.StandardTexture, shipRect, Color.White);
+			
+			string livesString =  " x " + lives;
+			spriteBatch.DrawString (myFont, livesString, new Vector2(ship.Width + shipRect.X,shipRect.Y) , Color.White);
+			
+			
 			//if invinsible show every other second
 			if (invinisbleTimeLeft <= 0 || (int)(invinisbleTimeLeft * 10) % 2 == 1)
 				spriteBatch.Draw (ship.Texture, ship.Position, null, Color.White, ship.Rotation, ship.Center, ship.Scale, SpriteEffects.None, 1.0f);
-			
+			//Draw free man
+			if(isFreeManVisible && (freeManVisibleTimeLeft > freeManBlinkTime || (int)(freeManVisibleTimeLeft * 10) % 2 == 1))
+				spriteBatch.Draw(freeManSprite.Texture,freeManSprite.Position,null,Color.White,freeManSprite.Rotation,freeManSprite.Center,freeManSprite.Scale,SpriteEffects.None,1f);
 			foreach (Sprite b in bullets) {
 				if (b.Alive) {
 					spriteBatch.Draw (b.Texture, b.Position, null, Color.White, b.Rotation, b.Center, b.Scale, SpriteEffects.None, 1.0f);
 				}
 			}
-			
 			foreach (Sprite a in asteroids) {
 				if (a.Alive) {
 					
@@ -815,6 +1041,8 @@ namespace AsteroidsHD
 			
 			if (TransitionPosition > 0)
 				ScreenManager.FadeBackBufferToBlack (255 - TransitionAlpha);
+			
+			base.Draw(gameTime);
 		}
 			/*
 			//GL.Viewport (0, 0, Size.Width, Size.Height);

@@ -9,6 +9,7 @@ namespace AsteroidsHD
 		{
 			CreateTable<Friend> ();
 			CreateTable<Face>();
+			CreateTable<score>();
 		}
 		
 		static Database ()

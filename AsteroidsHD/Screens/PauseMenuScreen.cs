@@ -26,7 +26,6 @@ namespace AsteroidsHD
     {
         #region Initialization
 
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -37,19 +36,49 @@ namespace AsteroidsHD
             // off when the pause menu is on top of it.
             IsPopup = true;
 
+        }
+		SliderMenuEntry slider;
+		MenuEntry useSound;
+		public override void LoadContent ()
+		{
+			base.LoadContent();	
             // Create our menu entries.
             MenuEntry resumeGameMenuEntry = new MenuEntry("Resume Game");
             MenuEntry quitGameMenuEntry = new MenuEntry("Quit Game");
-            
+			useSound = new MenuEntry("");
+			
+			useSound.Selected += delegate {
+				Settings.UseSound = !Settings.UseSound;	
+				setTitles();
+			};
+			setTitles();
+            slider = new SliderMenuEntry("Sensitivity",Settings.Sensativity,ScreenManager);
+			
+			slider.ValueChanged += (value)=>
+			{
+				Settings.Sensativity = value;
+			};
             // Hook up menu event handlers.
-            resumeGameMenuEntry.Selected += OnCancel;
+            resumeGameMenuEntry.Selected += OnGetFacebook;
             quitGameMenuEntry.Selected += QuitGameMenuEntrySelected;
-
+			
             // Add entries to the menu.
             MenuEntries.Add(resumeGameMenuEntry);
+			MenuEntries.Add(slider);
+			MenuEntries.Add(useSound);
             MenuEntries.Add(quitGameMenuEntry);
-        }
-
+		}
+		
+		private void setTitles()
+		{
+			useSound.Text = "Sound: " + (Settings.UseSound ? "On":"Off");
+		}
+		
+		public override void UnloadContent ()
+		{
+			base.UnloadContent ();
+			slider.Unload();
+		}
 
         #endregion
 
@@ -82,7 +111,6 @@ namespace AsteroidsHD
         public override void Draw(GameTime gameTime)
         {
             ScreenManager.FadeBackBufferToBlack(TransitionAlpha * 2 / 3);
-
             base.Draw(gameTime);
         }
 

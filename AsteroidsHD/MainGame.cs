@@ -15,16 +15,10 @@ namespace AsteroidsHD
         GraphicsDeviceManager graphics;
         public ScreenManager ScreenManager;
 
-#if ZUNE
-        int BufferWidth = 272;
-        int BufferHeight = 480;
-#elif IPHONE
+
         int BufferWidth = 320;
         int BufferHeight = 480;
-#else
-        int BufferWidth = 272;
-        int BufferHeight = 480;
-#endif
+
         #endregion
 
         #region Initialization
@@ -50,7 +44,7 @@ namespace AsteroidsHD
             Components.Add(ScreenManager);
 
             // Activate the first screens.
-            ScreenManager.AddScreen(new BackgroundScreen(), null);
+            ScreenManager.AddScreen(Util.BackgroundScreen, null);
             ScreenManager.AddScreen(new MainMenuScreen(), null);
         }
 

@@ -13,6 +13,7 @@ using System;
 using Microsoft.Xna.Framework;
 #else
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 #endif
 #endregion
 
@@ -194,7 +195,10 @@ namespace AsteroidsHD
 
 		#region Update and Draw
 
-
+		int _total_frames = 0;
+		TimeSpan _elapsed_time = TimeSpan.Zero;
+		int _fps = 0;
+		
 		/// <summary>
 		/// Allows the screen to run logic, such as updating the transition position.
 		/// Unlike HandleInput, this method is called regardless of whether the screen
@@ -202,6 +206,17 @@ namespace AsteroidsHD
 		/// </summary>
 		public virtual void Update (GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
 		{
+			_elapsed_time += gameTime.ElapsedGameTime;
+ 
+            // 1 Second has passed
+              if (_elapsed_time > TimeSpan.FromSeconds(1))
+            {
+                _fps = _total_frames;
+                _total_frames = 0;
+                _elapsed_time -= TimeSpan.FromSeconds(1);
+            }
+			
+			
 			this.otherScreenHasFocus = otherScreenHasFocus;
 			if (isExiting) {
 				// If the screen is going away to die, it should transition off.
@@ -275,6 +290,14 @@ namespace AsteroidsHD
 		/// </summary>
 		public virtual void Draw (GameTime gameTime)
 		{
+			 _total_frames++;
+            //GraphicsDevice.Clear(Color.CornflowerBlue);
+ 			SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+            spriteBatch.Begin();
+            spriteBatch.DrawString(ScreenManager.Font, string.Format("FPS={0}", _fps),
+                new Vector2(10.0f, 60.0f), Color.White);
+            spriteBatch.End();
+			
 		}
 
 

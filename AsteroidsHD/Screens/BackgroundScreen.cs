@@ -42,7 +42,34 @@ namespace AsteroidsHD
  
         int iParallaxWidth = 1680;
         int iParallaxHeight = 480;
-
+		public Vector2 Velocity = new Vector2(1,1);
+		private int color = 0;
+		public void ChangeColor()
+		{
+			string image = "PrimaryBackground";
+			switch(color)
+			{
+			case 1:
+				image += "-green";
+				break;
+			case 2:
+				image += "-purple";
+				break;
+			case 3:
+				image += "-teal";
+				break;
+			case 4:
+				image += "-yellow";
+				break;
+			default:
+					break;
+			}
+			
+			t2dBackground = content.Load<Texture2D>(image);
+			color ++;
+			if(color >4)
+				color = 0;
+		}
 
         #endregion
 
@@ -70,17 +97,17 @@ namespace AsteroidsHD
         {
             if (content == null)
                 content = new ContentManager(ScreenManager.Game.Services, "Content");
-
 			
-			t2dBackground = content.Load<Texture2D>("PrimaryBackground");
+			ChangeColor();
+			
             iBackgroundWidth = t2dBackground.Width;
             iBackgroundHeight = t2dBackground.Height;
             t2dParallax = content.Load<Texture2D>("ParallaxStars");
             iParallaxWidth = t2dParallax.Width;
             iParallaxHeight = t2dParallax.Height;
 			
-			iViewportWidth = ScreenManager.Width + 5;
-			iViewportHeight = ScreenManager.Height + 5;
+			iViewportWidth = ScreenManager.Width;
+			iViewportHeight = ScreenManager.Height;
         }
 
 
@@ -108,8 +135,10 @@ namespace AsteroidsHD
         public override void Update(GameTime gameTime, bool otherScreenHasFocus,
                                                        bool coveredByOtherScreen)
         {
-			BackgroundOffset += 1;
-            ParallaxOffset += 3;
+			BackgroundOffsetX += (int)Velocity.X;
+			//BackgroundOffsetY -= (int)Velocity.Y;
+            ParallaxOffsetX += (int)(3 *Velocity.X);
+            //ParallaxOffsetY -= (int)(3 *Velocity.Y);
             base.Update(gameTime, otherScreenHasFocus, false);
         }
 
@@ -140,80 +169,162 @@ namespace AsteroidsHD
             // Draw the background panel, offset by the player's location
             spriteBatch.Draw(
                 t2dBackground,
-                new Rectangle(-1 * iBackgroundOffset, 
-                              0, iBackgroundWidth, 
-                              iViewportHeight), 
+                new Rectangle(-1 * iBackgroundOffsetX, 
+                              iBackgroundOffsetY , iBackgroundWidth, 
+                              iViewportHeight + 40), 
                 Color.White);
             
             // If the right edge of the background panel will end 
             // within the bounds of the display, draw a second copy 
             // of the background at that location.
-            if (iBackgroundOffset > iBackgroundWidth-iViewportWidth) { 
+            if (iBackgroundOffsetX > iBackgroundWidth-iViewportWidth) { 
                 spriteBatch.Draw(
                     t2dBackground,
                     new Rectangle(
-                      (-1 * iBackgroundOffset) + iBackgroundWidth, 
-                      0, 
+                      (-1 * iBackgroundOffsetX) + iBackgroundWidth, 
+                      iBackgroundOffsetY, 
                       iBackgroundWidth,
-                      iViewportHeight), 
+                      iViewportHeight+ 40), 
                     Color.White); }
+			
+			if(iBackgroundOffsetY > iBackgroundHeight - iViewportHeight -40){
+                spriteBatch.Draw(
+                    t2dBackground,
+                    new Rectangle(
+                      -1 * iBackgroundOffsetX, 
+                      (  iBackgroundOffsetY) - iBackgroundHeight, 
+                      iBackgroundWidth,
+                      iViewportHeight + 40), 
+                    Color.White); }
+			
+			
+			
+			
+			if(iBackgroundOffsetY > iBackgroundHeight - iViewportHeight - 40 && iBackgroundOffsetX > iBackgroundWidth-iViewportWidth){
+                spriteBatch.Draw(
+                    t2dBackground,
+                    new Rectangle(
+                      (-1 * iBackgroundOffsetX) + iBackgroundWidth, 
+                      (  iBackgroundOffsetY) - iBackgroundHeight, 
+                      iBackgroundWidth,
+                      iViewportHeight + 40), 
+                    Color.White); }
+			
  
             if (drawParallax)
             {
                 // Draw the parallax star field
                 spriteBatch.Draw(
                     t2dParallax,
-                    new Rectangle(-1 * iParallaxOffset, 
-                                  0, iParallaxWidth, 
+                    new Rectangle(-1 * iParallaxOffsetX, 
+                                  iParallaxOffsetY, iParallaxWidth, 
                                   iViewportHeight), 
                     Color.SlateGray);
                 // if the player is past the point where the star 
                 // field will end on the active screen we need 
                 // to draw a second copy of it to cover the 
                 // remaining screen area.
-                if (iParallaxOffset > iParallaxWidth-iViewportWidth) { 
+                if (iParallaxOffsetX > iParallaxWidth-iViewportWidth) { 
                     spriteBatch.Draw(
                         t2dParallax, 
                         new Rectangle(
-                          (-1 * iParallaxOffset) + iParallaxWidth, 
-                          0,
+                          (-1 * iParallaxOffsetX) + iParallaxWidth, 
+                          iParallaxOffsetY,
                           iParallaxWidth,
                           iViewportHeight), 
                         Color.SlateGray); }
+								/*
+				if(iParallaxOffsetY > iParallaxHeight - iViewportHeight - 40 ){
+                spriteBatch.Draw(
+                    t2dParallax,
+                    new Rectangle(
+                      -1 * iParallaxOffsetX, 
+                      (  iParallaxOffsetY) - iParallaxHeight, 
+                      iParallaxWidth,
+                      iViewportHeight + 40 ), 
+                    Color.White); }
+			
+			
+			
+			
+			if(iParallaxOffsetY > iParallaxHeight - iViewportHeight -40 && iParallaxOffsetX > iParallaxWidth-iViewportWidth){
+                spriteBatch.Draw(
+                    t2dParallax,
+                    new Rectangle(
+                      (-1 * iParallaxOffsetX) + iParallaxWidth, 
+                      (  iParallaxOffsetY) - iParallaxHeight, 
+                      iParallaxWidth,
+                      iViewportHeight + 40), 
+                    Color.White); }
+				*/
             }
         }
-		int iBackgroundOffset;
-        int iParallaxOffset;
-		public int BackgroundOffset
+		int iBackgroundOffsetX;
+		int iBackgroundOffsetY;
+        int iParallaxOffsetX;
+        int iParallaxOffsetY;
+		public int BackgroundOffsetX
         {
-            get { return iBackgroundOffset; }
+            get { return iBackgroundOffsetX; }
             set
             {
-                iBackgroundOffset = value;
-                if (iBackgroundOffset < 0)
+                iBackgroundOffsetX = value;
+                if (iBackgroundOffsetX < 0)
                 {
-                    iBackgroundOffset += iBackgroundWidth;
+                    iBackgroundOffsetX += iBackgroundWidth;
                 }
-                if (iBackgroundOffset > iBackgroundWidth)
+                if (iBackgroundOffsetX > iBackgroundWidth)
                 {
-                    iBackgroundOffset -= iBackgroundWidth;
+                    iBackgroundOffsetX -= iBackgroundWidth;
+                }
+            }
+        }
+		public int BackgroundOffsetY
+        {
+            get { return iBackgroundOffsetY; }
+            set
+            {
+                iBackgroundOffsetY = value;
+                if (iBackgroundOffsetY < 0)
+                {
+                    iBackgroundOffsetY += iBackgroundHeight;
+                }
+                if (iBackgroundOffsetY > iBackgroundHeight)
+                {
+                    iBackgroundOffsetY -= iBackgroundHeight;
                 }
             }
         }
  
-        public int ParallaxOffset
+        public int ParallaxOffsetX
         {
-            get { return iParallaxOffset; }
+            get { return iParallaxOffsetX; }
             set
             {
-                iParallaxOffset = value;
-                if (iParallaxOffset < 0)
+                iParallaxOffsetX = value;
+                if (iParallaxOffsetX < 0)
                 {
-                    iParallaxOffset += iParallaxWidth;
+                    iParallaxOffsetX += iParallaxWidth;
                 }
-                if (iParallaxOffset > iParallaxWidth)
+                if (iParallaxOffsetX > iParallaxWidth)
                 {
-                    iParallaxOffset -= iParallaxWidth;
+                    iParallaxOffsetX -= iParallaxWidth;
+                }
+            }
+        }
+        public int ParallaxOffsetY
+        {
+            get { return iParallaxOffsetY; }
+            set
+            {
+                iParallaxOffsetY = value;
+                if (iParallaxOffsetY < 0)
+                {
+                    iParallaxOffsetY += iParallaxHeight;
+                }
+                if (iParallaxOffsetY > iParallaxHeight)
+                {
+                    iParallaxOffsetY -= iParallaxHeight;
                 }
             }
         }

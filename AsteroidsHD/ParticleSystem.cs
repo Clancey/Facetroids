@@ -46,6 +46,11 @@ namespace AsteroidsHD
             fire = content.Load<Texture2D>("fire");
             smoke = content.Load<Texture2D>("smoke");
         }
+		
+		public void Reset()
+		{
+			particles.Clear();
+		}
 
         /// <summary>
         /// Update all active particles.
@@ -128,19 +133,19 @@ namespace AsteroidsHD
         {
             Particle p = null;
 
-            for (int i = 0; i < 8; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 p = CreateParticle();
                 p.Position = position;
                 p.RotationRate = -6.0f + 12.0f * (float)random.NextDouble();
-                p.Scale = 0.2f;
+                p.Scale = 0.1f;
                 p.ScaleRate = 0.25f;// *(float)random.NextDouble();
-                p.Alpha = 2.0f;
+                p.Alpha = .75f;
                 p.AlphaRate = -1.0f;
                 p.Velocity.X = -32.0f + 64.0f * (float)random.NextDouble();
                 p.Velocity.Y = -32.0f + 64.0f * (float)random.NextDouble();
                 p.Texture = smoke;
-                p.Life = 2.0f;
+                p.Life = 1.0f;
             }
 			/*
             for (int i = 0; i < 3; ++i)
@@ -169,14 +174,14 @@ namespace AsteroidsHD
         {
             Particle p = null;
 
-            for (int i = 0; i < 16; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 p = CreateParticle();
                 p.Position = position;
                 p.RotationRate = -6.0f + 12.0f * (float)random.NextDouble();
                 p.Scale = 0.2f;
                 p.ScaleRate = 0.25f;// *(float)random.NextDouble();
-                p.Alpha = 2.0f;
+                p.Alpha = 1.0f;
                 p.AlphaRate = -1.0f;
                 p.Velocity.X = -32.0f + 64.0f * (float)random.NextDouble();
                 p.Velocity.Y = -32.0f + -48.0f * (float)random.NextDouble();

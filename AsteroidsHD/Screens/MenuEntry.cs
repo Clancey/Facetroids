@@ -42,8 +42,8 @@ namespace AsteroidsHD
         /// <remarks>
         /// The entries transition out of the selection effect when they are deselected.
         /// </remarks>
-        float selectionFade;
-		float globalScale = 1.5f;
+        public float selectionFade;
+		public float globalScale = 1.5f;
         #endregion
 
         #region Properties
@@ -147,7 +147,7 @@ namespace AsteroidsHD
             spriteBatch.DrawString(font, text, position, color, 0,
                                    Offset, scale, SpriteEffects.None, 0);
 			
-			Frame = new Rectangle((int)(position.X - (Offset.X * globalScale)),(int)position.Y,
+			Frame = new Rectangle((int)(position.X - (Offset.X * globalScale)),(int)(position.Y - (Offset.Y * globalScale)),
 			                      (int)(fontSize.X * globalScale),(int)(fontSize.Y * globalScale));
         }
 

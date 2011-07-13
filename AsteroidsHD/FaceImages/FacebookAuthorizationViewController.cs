@@ -50,6 +50,8 @@ namespace MonoTouch.Facebook.Authorization
 		UIWebView webView;
 		UIActivityIndicatorView activityIndicator;
 		UIView loadingView;
+		UIToolbar toolbar;
+		UIBarButtonItem cancelBtn;
 		
 		#region Constructors
 
@@ -68,7 +70,7 @@ namespace MonoTouch.Facebook.Authorization
 		}
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-			return (toInterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || toInterfaceOrientation == UIInterfaceOrientation.LandscapeRight);
+			return true;//(toInterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || toInterfaceOrientation == UIInterfaceOrientation.LandscapeRight);
 		}
 		
 		public string[] ExtendedPermissions
@@ -92,7 +94,19 @@ namespace MonoTouch.Facebook.Authorization
 		{
 			base.ViewDidLoad ();
 			
-			this.webView = new UIWebView(new RectangleF(0, 0, this.View.Frame.Width, this.View.Frame.Height));
+			this.toolbar = new UIToolbar(new RectangleF(-1,0,this.View.Frame.Width,30));
+			toolbar.TintColor = UIColor.Black;
+			cancelBtn = new UIBarButtonItem("Cancel",UIBarButtonItemStyle.Done,delegate{
+				if(Canceled != null)
+					Canceled(this, null);
+				//Hide the activity indicator
+				this.activityIndicator.StopAnimating();
+				this.loadingView.Hidden = true;
+			});
+			toolbar.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
+			toolbar.SetItems(new UIBarButtonItem[]{cancelBtn},false);
+			
+			this.webView = new UIWebView(new RectangleF(0, 30, this.View.Frame.Width, this.View.Frame.Height - 30));
 			this.webView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
 			
 			//This is for the overlay 			
@@ -105,9 +119,12 @@ namespace MonoTouch.Facebook.Authorization
 			this.activityIndicator.AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin;
 			this.activityIndicator.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge;
 			
+			
+			
 			this.loadingView.AddSubview(this.activityIndicator);
 			this.View.AddSubview(this.webView);
 			this.View.AddSubview(this.loadingView);
+			this.View.AddSubview(this.toolbar);
 			
 			//Want to display the indicator
 			this.webView.LoadStarted += delegate {

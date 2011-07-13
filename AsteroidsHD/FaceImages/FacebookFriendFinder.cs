@@ -23,7 +23,7 @@ namespace AsteroidsHD
 		{
 			if(string.IsNullOrEmpty(Settings.FbAuth) || Settings.FbAuthExpire <= DateTime.Now)
 			{				
-				fvc = new FacebookAuthorizationViewController("172317429487848", new string[] {"publish_stream"}, FbDisplayType.Touch);
+				fvc = new FacebookAuthorizationViewController("158978690838499", new string[] {"publish_stream"}, FbDisplayType.Touch);
 				fvc.AccessToken += delegate(string accessToken, DateTime expires) {
 					Settings.FbAuth = accessToken;
 					Settings.FbAuthExpire = expires;

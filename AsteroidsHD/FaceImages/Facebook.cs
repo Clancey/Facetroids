@@ -12,7 +12,7 @@ namespace AsteroidsHD
 			if(images.Count() == 0)
 			{
 				Console.WriteLine("No Images found");
-				images = new string[] {"Content/asteroid-front.pdf"};
+				images = new string[] {"Content/asteroid.png"};
 			}
 			
 			Console.WriteLine(images[0]);

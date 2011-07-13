@@ -35,6 +35,7 @@ namespace AsteroidsHD
         List<MenuEntry> menuEntries = new List<MenuEntry>();
         int selectedEntry = 0;
         string menuTitle;
+		string AditionalHeader;
 
         #endregion
 
@@ -59,12 +60,17 @@ namespace AsteroidsHD
         /// <summary>
         /// Constructor.
         /// </summary>
-        public MenuScreen(string menuTitle)
+        /// 
+        public MenuScreen(string menuTitle,string additionalHeader)
         {
             this.menuTitle = menuTitle;
-
+			this.AditionalHeader = additionalHeader;
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
+        }
+        public MenuScreen(string menuTitle): this(menuTitle,"")
+        {
+			
         }
 
 
@@ -85,6 +91,7 @@ namespace AsteroidsHD
 			{
 				var touch = touches[0];
 				var position = GetOffsetPosition(touch.Position,false);
+				
 				if(touch.State == TouchLocationState.Pressed  || touch.State == TouchLocationState.Moved)
 				{
 					for (int i = 0; i < menuEntries.Count; i++)
@@ -100,7 +107,10 @@ namespace AsteroidsHD
 					{
 						MenuEntry menuEntry = menuEntries[i];
 						if(menuEntry.Frame.Contains(position))
+						{
+							selectedEntry = i;
 							OnSelectEntry(i, PlayerIndex.One);
+						}
 					}
 				}
 				
@@ -169,7 +179,7 @@ namespace AsteroidsHD
         /// <summary>
         /// Helper overload makes it easy to use OnCancel as a MenuEntry event handler.
         /// </summary>
-        protected void OnCancel(object sender, PlayerIndexEventArgs e)
+        protected void OnGetFacebook(object sender, PlayerIndexEventArgs e)
         {
             OnCancel(e.PlayerIndex);
         }
@@ -231,21 +241,33 @@ namespace AsteroidsHD
 
                 menuEntry.Draw(this, position, isSelected, gameTime);
 
-                position.Y += menuEntry.GetHeight(this);
+                position.Y += menuEntry.GetHeight(this);// + 10;
             }
 
             // Draw the menu title.            
+            Vector2 headerPosition = new Vector2(ScreenManager.Width / 2, 40);
+            Vector2 headerOrigin = font.MeasureString(AditionalHeader) / 2;
+            Color headerColor = new Color(192, 192, 192, TransitionAlpha);
+            float titleScale = 1.25f;
+
+            headerPosition.Y -= transitionOffset * 100;
+
+            spriteBatch.DrawString(font, AditionalHeader, headerPosition, headerColor, 0,
+                                   headerOrigin, titleScale, SpriteEffects.None, 0);
+			
+			
             Vector2 titlePosition = new Vector2(ScreenManager.Width / 2, 80);
             Vector2 titleOrigin = font.MeasureString(menuTitle) / 2;
             Color titleColor = new Color(192, 192, 192, TransitionAlpha);
-            float titleScale = 1.25f;
 
             titlePosition.Y -= transitionOffset * 100;
+
 
             spriteBatch.DrawString(font, menuTitle, titlePosition, titleColor, 0,
                                    titleOrigin, titleScale, SpriteEffects.None, 0);
 
             spriteBatch.End();
+			base.Draw(gameTime);
         }
 
 

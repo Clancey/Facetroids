@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C89D7BF3-6664-4847-A95D-8E0FB8743302}</ProjectGuid>
+    <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AsteroidsHD</RootNamespace>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <SupportedDevices>IPhoneAndIPad</SupportedDevices>
+    <BundleIdentifier>com.youriisolutions.faceteroids</BundleIdentifier>
+    <BundleDisplayName>Facetroids</BundleDisplayName>
+    <BundleVersion>1.0</BundleVersion>
+    <BundleIcon>logo.png</BundleIcon>
+    <BundleIconHigh>logo@2x.png</BundleIconHigh>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>True</MtouchDebug>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchI18n />
+    <AssemblyName>Faceteroids</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+    <AssemblyName>Faceteroids</AssemblyName>
+    <MtouchI18n />
+    <MtouchExtraArgs>-vvv</MtouchExtraArgs>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchDebug>True</MtouchDebug>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <ConsolePause>false</ConsolePause>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchI18n />
+    <AssemblyName>AsteroidsHD</AssemblyName>
+    <CodesignProvision>4DD9E24C-2474-40D6-A9A1-E77DE891140E</CodesignProvision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>iPhone Developer: James Clancey (MPFNK7YA6W)</CodesignKey>
+    <MtouchArch>ARMv6</MtouchArch>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <AssemblyName>Faceteroids</AssemblyName>
+    <MtouchI18n />
+    <CodesignProvision>CA889BD3-5FC4-41F6-BAE6-208C0242E7E2</CodesignProvision>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+    <Reference Include="OpenTK" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties InternalTargetFrameworkVersion="IPhone" />
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <None Include="Info.plist" />
+    <None Include="logo.png" />
+    <None Include="logo%402x.png" />
+    <None Include="logo-ipad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Sprite.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="Extender.cs" />
+    <Compile Include="Ship.cs" />
+    <Compile Include="FaceImages\Constants.cs" />
+    <Compile Include="3dObj\ObjModel.cs" />
+    <Compile Include="3dObj\ObjModelLoader.cs" />
+    <Compile Include="FaceImages\Graphics.cs" />
+    <Compile Include="FaceImages\ImageStore.cs" />
+    <Compile Include="FaceImages\LRUCache.cs" />
+    <Compile Include="FaceImages\Facebook.cs" />
+    <Compile Include="FaceImages\FacebookAuthorizationViewController.cs" />
+    <Compile Include="FaceImages\FacebookFriendFinder.cs" />
+    <Compile Include="FaceImages\HttpEncoder.cs" />
+    <Compile Include="FaceImages\HttpUtility.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="ScreenManager\GameScreen.cs" />
+    <Compile Include="ScreenManager\InputState.cs" />
+    <Compile Include="ScreenManager\ScreenManager.cs" />
+    <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Screens\GameplayScreen.cs" />
+    <Compile Include="Screens\LoadingScreen.cs" />
+    <Compile Include="Screens\MainMenuScreen.cs" />
+    <Compile Include="Screens\MenuEntry.cs" />
+    <Compile Include="Screens\MenuScreen.cs" />
+    <Compile Include="Screens\MessageBoxScreen.cs" />
+    <Compile Include="Screens\OptionsMenuScreen.cs" />
+    <Compile Include="Screens\PauseMenuScreen.cs" />
+    <Compile Include="Screens\PlayerIndexEventArgs.cs" />
+    <Compile Include="MainGame.cs" />
+    <Compile Include="FaceImages\DataAccess.cs" />
+    <Compile Include="FaceImages\Friend.cs" />
+    <Compile Include="FaceImages\FaceRestAPI.cs" />
+    <Compile Include="FaceImages\FaceResult.cs" />
+    <Compile Include="FaceImages\Database.cs" />
+    <Compile Include="FaceImages\SQLite.cs" />
+    <Compile Include="ParticleSystem.cs" />
+    <Compile Include="..\..\ClanceysLib\ClanceysLib\UIControls\MBProgressHUD.cs">
+      <Link>ClanceyLib\MBProgressHUD.cs</Link>
+    </Compile>
+    <Compile Include="Screens\QuitMenu.cs" />
+    <Compile Include="Screens\ContinueMenuScreen.cs" />
+    <Compile Include="Models\score.cs" />
+    <Compile Include="Screens\InstructionsScreen.cs" />
+    <Compile Include="Screens\Slider.cs" />
+    <Compile Include="Screens\SliderMenuEntry.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\background.png" />
+    <Content Include="Content\BANNER.bmp" />
+    <Content Include="Content\gamepad.png" />
+    <Content Include="Content\shot-frame1.png" />
+    <Content Include="Content\Fonts\SpriteFont1.xnb" />
+    <Content Include="Content\ship.pdf" />
+    <Content Include="Content\ship-thrust.pdf" />
+    <Content Include="Content\Retro\large1.pdf" />
+    <Content Include="Content\Retro\large2.pdf" />
+    <Content Include="Content\Retro\ship.pdf" />
+    <Content Include="Content\Retro\large3.pdf" />
+    <Content Include="Content\Retro\medium1.pdf" />
+    <Content Include="Content\Retro\medium2.pdf" />
+    <Content Include="Content\Retro\medium3.pdf" />
+    <Content Include="Content\Retro\small1.pdf" />
+    <Content Include="Content\Retro\small2.pdf" />
+    <Content Include="Content\Retro\small3.pdf" />
+    <Content Include="Content\blank.png" />
+    <Content Include="Content\gamefont.xnb" />
+    <Content Include="Content\menufont.xnb" />
+    <Content Include="Content\gradient.png" />
+    <Content Include="Content\Alien_Hit.wav" />
+    <Content Include="Content\Player_Hit.wav" />
+    <Content Include="Content\Tank_Fire.wav" />
+    <Content Include="Content\fire.wav" />
+    <Content Include="Content\ParallaxStars.png" />
+    <Content Include="Content\PrimaryBackground.png" />
+    <Content Include="Content\fire.png" />
+    <Content Include="Content\smoke.png" />
+    <Content Include="Content\pause.png" />
+    <Content Include="Content\rightArrow.png" />
+    <Content Include="Content\upArrow.png" />
+    <Content Include="Content\leftArrow.png" />
+    <Content Include="Content\asteroid.png" />
+    <Content Include="Content\asteroid%402x.png" />
+    <Content Include="Content\PrimaryBackground-green.png" />
+    <Content Include="Content\PrimaryBackground-purple.png" />
+    <Content Include="Content\PrimaryBackground-teal.png" />
+    <Content Include="Content\PrimaryBackground-yellow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>MonoGame.Framework.iOS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Newtonsoft.Json\Newtonsoft.Json\Newtonsoft.Json.MonoTouch.csproj">
+      <Project>{7E04C0C7-C26E-4F5E-A634-A687757E76A1}</Project>
+      <Name>Newtonsoft.Json.MonoTouch</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\Retro\" />
+    <Folder Include="FaceImages\" />
+    <Folder Include="ClanceyLib\" />
+  </ItemGroup>
+</Project>

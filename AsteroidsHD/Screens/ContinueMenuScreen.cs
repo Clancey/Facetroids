@@ -7,7 +7,7 @@ namespace AsteroidsHD
 		MenuEntry continueMenu;
 		MenuEntry quiteMenu;
         public event EventHandler<PlayerIndexEventArgs> Continue;
-		public ContinueMenuScreen () : base("Do you want to play again?")
+		public ContinueMenuScreen (string extraText) : base("Do you want to play again?",extraText)
 		{
 			continueMenu = new MenuEntry ("Play Again");
 			quiteMenu = new MenuEntry("Main Menu");

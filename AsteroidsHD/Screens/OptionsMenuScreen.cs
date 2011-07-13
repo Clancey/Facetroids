@@ -12,6 +12,7 @@
 using Microsoft.Xna.Framework;
 #else
 using Microsoft.Xna.Framework;
+using System;
 #endif
 #endregion
 
@@ -27,6 +28,9 @@ namespace AsteroidsHD
 		#region Fields
 
 		MenuEntry gameTypeMenu;
+		MenuEntry controlMenu;
+		SliderMenuEntry slider;
+		MenuEntry backMenuEntry;
 		//MenuEntry languageMenuEntry;
 		//MenuEntry frobnicateMenuEntry;
 		//MenuEntry elfMenuEntry;
@@ -41,38 +45,67 @@ namespace AsteroidsHD
 		/// </summary>
 		public OptionsMenuScreen () : base("Options")
 		{
+			Console.WriteLine("options created");
 			// Create our menu entries.
-			gameTypeMenu = new MenuEntry (string.Empty);
-			//languageMenuEntry = new MenuEntry(string.Empty);
-			//frobnicateMenuEntry = new MenuEntry(string.Empty);
-			//elfMenuEntry = new MenuEntry(string.Empty);
 			
+		}
+		public override void LoadContent ()
+		{
+			Console.WriteLine("loading content");
+			base.LoadContent ();
+			Console.WriteLine("base content loaded");
+			gameTypeMenu = new MenuEntry (string.Empty);
+			controlMenu = new MenuEntry(string.Empty);
+			
+			Console.WriteLine("loading slider:" + ScreenManager == null);
+
+			slider = new SliderMenuEntry("Sensitivity",Settings.Sensativity,ScreenManager);
+			
+			Console.WriteLine("slider loaded");
+			backMenuEntry = new MenuEntry ("Back");
+			
+			Console.WriteLine("back done");
 			SetMenuEntryText ();
 			
-			MenuEntry backMenuEntry = new MenuEntry ("Back");
 			
 			// Hook up menu event handlers.
 			gameTypeMenu.Selected += UngulateMenuEntrySelected;
-			//languageMenuEntry.Selected += LanguageMenuEntrySelected;
-			//frobnicateMenuEntry.Selected += FrobnicateMenuEntrySelected;
-			//elfMenuEntry.Selected += ElfMenuEntrySelected;
-			backMenuEntry.Selected += OnCancel;
+			controlMenu.Selected += delegate {
+				Settings.UseAccel = !Settings.UseAccel;
+				controlMenu.Text = "Controls: " + (Settings.UseAccel ? "Accelerometer" : "Gamepad");
+			};
 			
+			slider.ValueChanged += (value)=>
+			{
+				Settings.Sensativity = value;
+			};
+			
+			backMenuEntry.Selected+= OnGetFacebook;;
+			
+			Console.WriteLine("adding menu entries");
 			// Add entries to the menu.
 			MenuEntries.Add (gameTypeMenu);
-			//MenuEntries.Add(languageMenuEntry);
-			//MenuEntries.Add(frobnicateMenuEntry);
-			//MenuEntries.Add(elfMenuEntry);
+			MenuEntries.Add(controlMenu);
+			MenuEntries.Add(slider);
 			MenuEntries.Add (backMenuEntry);
+			
+			Console.WriteLine("loading content completed");
 		}
-
+		
+		public override void UnloadContent ()
+		{
+			base.UnloadContent ();
+			slider.Unload();
+		}
 
 		/// <summary>
 		/// Fills in the latest values for the options screen menu text.
 		/// </summary>
 		void SetMenuEntryText ()
 		{
+			Console.WriteLine("Setting text");
 			gameTypeMenu.Text = "Game Type: " + Settings.GameType;
+			controlMenu.Text = "Controls: " + (Settings.UseAccel ? "Accelerometer" : "Gamepad");
 			//languageMenuEntry.Text = "Language: " + languages[currentLanguage];
 			//frobnicateMenuEntry.Text = "Frobnicate: " + (frobnicate ? "on" : "off");
 			//elfMenuEntry.Text = "elf: " + elf;

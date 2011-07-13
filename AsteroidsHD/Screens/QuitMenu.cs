@@ -12,7 +12,7 @@ namespace AsteroidsHD
 			continueMenu = new MenuEntry ("Continue");
 			quiteMenu = new MenuEntry("Quit");
 			
-			continueMenu.Selected  += OnCancel;
+			continueMenu.Selected  += OnGetFacebook;;
 			
 			quiteMenu.Selected += delegate {
 				LoadingScreen.Load(ScreenManager, false, null, new BackgroundScreen(), new MainMenuScreen());

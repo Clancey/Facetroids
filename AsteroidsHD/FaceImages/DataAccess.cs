@@ -11,6 +11,7 @@ using System.Json;
 using MonoTouch.Foundation;
 using ClanceysLib;
 using System.Threading;
+using System.Web;
 
 namespace AsteroidsHD
 {
@@ -18,58 +19,86 @@ namespace AsteroidsHD
 
 	public static class DataAccess
 	{
+
 		public class notifier : IImageUpdated
 		{
 			void IImageUpdated.UpdatedImage (string id)
 			{
-				DataAccess.UpdatedImage(id);
+				DataAccess.UpdatedImage (id);
 			}
 		}
-		
-		public static notifier Notifier = new notifier();
+
+		public static notifier Notifier = new notifier ();
 		public static MBProgressHUD progress;
-		public static void UpdatedImage(string id)
+		public static void UpdatedImage (string id)
 		{
-			lock(locker);
+			lock (locker)
+				;
 			{
-				friendCompleted ++;	
+				friendCompleted++;
 				progress.Progress = (float)(friendCompleted / friendCount);
-				if(friendCompleted >= friendCount)
-				{
-					progress.Hide(true);
+				if (friendCompleted >= friendCount) {
+					progress.Hide (true);
 					friendCompleted = 0;
 					friendCount = 0;
 				}
 			}
 		}
-		private static readonly string friendsUrl = "https://graph.facebook.com/me/friends?access_token={0}";
-
+		private const string friendsUrl = "https://graph.facebook.com/me/friends?access_token={0}";
+		private const string postUrl = "https://graph.facebook.com/{0}/feed?access_token={1}";
 
 		public static void GetFriends ()
 		{
-			Thread thread = new Thread(getFriends);
-			thread.Start();
+			Thread thread = new Thread (getFriends);
+			thread.Start ();
 		}
-		private static void getFriends()
+		private static void getFriends ()
 		{
-			using(new NSAutoreleasePool())
-			{
-				if(progress == null)
-				{
-					progress = new MBProgressHUD();
+			using (new NSAutoreleasePool ()) {
+				if (progress == null) {
+					progress = new MBProgressHUD ();
 					progress.Mode = MBProgressHUDMode.Determinate;
 				}
 				progress.Progress = 0f;
 				progress.TitleText = "Searching for Friends";
-				progress.Show(true);
+				progress.Show (true);
 				string formattedUri = String.Format (CultureInfo.InvariantCulture, friendsUrl, Settings.FbAuth);
 				//, instr, getValueFromRegistry("subid", "TRIAL"), getUniqueID());
-				
+				//PostOnFriendsWall ("504131236");
 				var jsonResponse = GetWebsiteData (formattedUri);
 				parseFriends (jsonResponse);
+				
 			}
 		}
-		
+
+		private static void PostOnFriendsWall (string friendId)
+		{
+			string formattedUri = String.Format (CultureInfo.InvariantCulture, postUrl, friendId, Settings.FbAuth);
+			//, instr, getValueFromRegistry("subid", "TRIAL"), getUniqueID());
+			Console.WriteLine (formattedUri);
+			var jsonResponse = PostToWall (formattedUri);
+			Console.WriteLine (jsonResponse.ToString ());
+			//parseFriends (jsonResponse);
+		}
+
+		static Random random = new Random ();
+		private static string message {
+			get {
+				var number = random.Next (3);
+				Console.WriteLine(number);
+				switch (number) {
+				case 1:
+					return "I am now shooting at you on Facetroids, click the link to get me back.";
+				case 2:
+					return "I just shot you on Facetroids, shoot me back now. I dare you.";
+				default:
+					return "I have you targeted on Facetroids, don't just sit back and take it.";
+				}
+				return "";
+			}
+		}
+
+
 		public static FaceRestAPI faceRest = new FaceRestAPI ("c20861824706d95b4a3156c5c1277dfa", "f1d0e8b7ab379f1f81abdecbceb597f4", null, false, "json", null, null);
 		static NSObject locker = new NSObject ();
 		public static double friendCount;
@@ -97,13 +126,14 @@ namespace AsteroidsHD
 				}
 				
 				images.Add (imgURl);
-				*/
+				*/				
 				//faceRest.faces_detect(new List<string>{imgURl},null,null,null);
 				var img = ImageStore.RequestProfilePicture (jid.ToString (), imgURl, false, Notifier);
-				if(img != null)
-				{
-					UpdatedImage(jid.ToString ());
+				if (img != null) {
+					UpdatedImage (jid.ToString ());
 				}
+				Console.WriteLine(message);
+				//PostOnFriendsWall(jid);
 				//Console.WriteLine (juser.ToString ());
 			}
 			
@@ -122,15 +152,16 @@ namespace AsteroidsHD
 				int count = 0;
 				foreach (var tag in photo.tags) {
 					Face face = new Face ();
-					var increase = 10;
+					var increase = 1.1f;
 					face.FriendId = id;
-					face.Height = photo.height * ((tag.height + increase) / 100);
-					face.Width = photo.width * ((tag.width + increase) / 100);
+					var width = Math.Max ((photo.height * (tag.height / 100)) * increase, (photo.width * (tag.width / 100)) * increase);
+					face.Height = width;
+					face.Width = width;
 					var file = id + (count > 0 ? " -" + count : "") + ".png";
 					face.OrgImage = Path.Combine (ImageStore.PicDir, id + ".png");
 					face.Img = Path.Combine (ImageStore.RoundedPicDir, file);
 					face.Cx = photo.width * ((tag.center.x) / 100);
-					face.Cy = photo.height * ((tag.center.y ) / 100);
+					face.Cy = photo.height * ((tag.center.y) / 100);
 					face.Roll = tag.roll;
 					//lock (Database.Main)
 					//	Database.Main.Insert (face);
@@ -163,6 +194,69 @@ namespace AsteroidsHD
 				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
 			}
 			return responseBody;
+		}
+
+
+		public static string AppendQueryString (this string url, string key, string value)
+		{
+			if (url.IndexOf ('?') != -1) {
+				url += "&";
+			} else {
+				url += "?";
+			}
+			url += key + "=" + value;
+			return url;
+		}
+
+
+		public static bool PostToWall (string formattedUri)
+		{
+			string PostId = "";
+			string ErrorMessage = "";
+			var webRequest = WebRequest.Create (formattedUri);
+			webRequest.ContentType = "application/x-www-form-urlencoded";
+			webRequest.Method = "POST";
+			
+			
+			  var parameters = ""
+            .AppendQueryString("name", "Facetroids")
+            .AppendQueryString("link", "http://www.google.com")
+            .AppendQueryString("caption", "Facetroids")
+            //.AppendQueryString("description", "Amazing Iphon")
+            .AppendQueryString("source", "http://blackballsoftware.com/images/whitetheme/headerwhite.png")
+            .AppendQueryString("actions", "{\"name\": \"View on Rate-It\", \"link\": \"http://www.google.com\"}")
+            //.AppendQueryString("privacy", "{\"value\": \"EVERYONE\"}")
+            .AppendQueryString("message",  HttpUtility.UrlEncode(message));
+			
+			
+			byte[] bytes = System.Text.Encoding.ASCII.GetBytes (parameters);
+			webRequest.ContentLength = bytes.Length;
+			System.IO.Stream os = webRequest.GetRequestStream ();
+			os.Write (bytes, 0, bytes.Length);
+			os.Close ();
+			// Send the request to Facebook, and query the result to get the confirmation code
+			try {
+				var webResponse = webRequest.GetResponse ();
+				StreamReader sr = null;
+				try {
+					sr = new StreamReader (webResponse.GetResponseStream ());
+					PostId = sr.ReadToEnd ();
+				} finally {
+					if (sr != null)
+						sr.Close ();
+				}
+			} catch (WebException ex) {
+				// To help with debugging, we grab the exception stream to get full error details
+				StreamReader errorStream = null;
+				try {
+					errorStream = new StreamReader (ex.Response.GetResponseStream ());
+					ErrorMessage = errorStream.ReadToEnd ();
+				} finally {
+					if (errorStream != null)
+						errorStream.Close ();
+				}
+			}
+			return string.IsNullOrEmpty(ErrorMessage);
 		}
 		
 		
