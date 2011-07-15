@@ -349,6 +349,7 @@ namespace AsteroidsHD
 					lock(Database.Main)
 					{
 						Database.Main.Insert(new score((int)score,level,gameType,DateTime.Now));
+						Settings.LastScoreSaved = true;
 						foreach(var asteroid in asteroidTextures.Where(a=> a.IsFriend).ToList())
 							Database.Main.Update(asteroid.Friend);
 							
@@ -551,20 +552,19 @@ namespace AsteroidsHD
 
 		private void AllDead ()
 		{
-			bool allDead = true;
-			foreach (Sprite s in asteroids) {
-				if (s.Alive)
-					allDead = false;
-			}
-			
-			if(!hasAsteroids)
-				allDead = false;
-			if (allDead) {
+			if (asteroids.Count == 0) {
 				level++;
-				Util.BackgroundScreen.ChangeColor();
+				if(gameType != GameType.Retro)
+					Util.BackgroundScreen.ChangeColor();
 				asteroids.Clear ();
-				CreateAsteroids ();
 				bullets.Clear ();
+				CreateAsteroids ();
+				Settings.Score = (int)score;
+				Settings.Level = level;
+				Settings.LastScoreSaved = false;
+				if(brokeHighScore)
+					Settings.HighScore = (int)score;
+					
 			}
 			
 		}
@@ -643,7 +643,7 @@ namespace AsteroidsHD
 			}
 			if(isFreeManVisible)
 			{
-				if(CheckShipCollision(freeManSprite))
+				if(CheckSpriteCollision(ship,freeManSprite))
 				{
 					isFreeManVisible = false;
 					lives ++;
@@ -656,14 +656,13 @@ namespace AsteroidsHD
 			if(!hasAsteroids)
 				return;
 			int value;
-			var asteroidCount = baseAsteroids + level;
+			var asteroidCount = baseAsteroids + System.Math.Floor((double)level/2);
 			//asteroidCount = 1;
 			for (int i = 0; i < asteroidCount; i++) {
+				Console.WriteLine("Creating asteroid " + i + " of " + asteroidCount);
 				int index = random.Next (0, asteroidTextures.Count - 1);
-				
 				Asteroid tempAsteroid = new Asteroid (asteroidTextures[index]);
-				asteroids.Add (tempAsteroid);
-				asteroids[i].Index = 1;
+				tempAsteroid.Index = 1;
 				
 				double xPos = 0;
 				double yPos = 0;
@@ -673,7 +672,7 @@ namespace AsteroidsHD
 				switch (value) {
 				case 0:
 				case 1:
-					xPos = asteroids[i].Width + random.NextDouble () * 40;
+					xPos = tempAsteroid.Width + random.NextDouble () * 40;
 					yPos = random.NextDouble () * ScreenHeight;
 					break;
 				case 2:
@@ -684,26 +683,29 @@ namespace AsteroidsHD
 				case 4:
 				case 5:
 					xPos = random.NextDouble () * ScreenWidth;
-					yPos = asteroids[i].Height + random.NextDouble () * 40;
+					yPos = tempAsteroid.Height + random.NextDouble () * 40;
 					break;
 				default:
 					xPos = random.NextDouble () * ScreenWidth;
 					yPos = ScreenHeight - random.NextDouble () * 40;
 					break;
 				}
+				tempAsteroid.Position = new Vector2 ((float)xPos, (float)yPos);
 				
-				asteroids[i].Position = new Vector2 ((float)xPos, (float)yPos);
+				Console.WriteLine("New Asteroid " + value + " , " + tempAsteroid.Position);
+				tempAsteroid.Velocity = RandomVelocity ();
 				
-				asteroids[i].Velocity = RandomVelocity ();
-				
-				asteroids[i].Rotation = (float)random.NextDouble () * MathHelper.Pi * 4 - MathHelper.Pi * 2;
-				asteroids[i].RotationSpin = (float)random.NextDouble () * random.Next (-1, 1);
-				asteroids[i].Create ();
+				tempAsteroid.Rotation = (float)random.NextDouble () * MathHelper.Pi * 4 - MathHelper.Pi * 2;
+				tempAsteroid.RotationSpin = (float)random.NextDouble () * random.Next (-1, 1);
+				tempAsteroid.Create ();				
+				asteroids.Add (tempAsteroid);
 			}
 		}
 
 		private void UpdateAsteroids (GameTime gameTime)
 		{
+			
+			List<Asteroid> destroyed = new List<Asteroid> ();
 			foreach (Asteroid a in asteroids) {
 				a.Position += a.Velocity;
 				a.Rotation += a.RotationSpin * .05f;
@@ -721,7 +723,7 @@ namespace AsteroidsHD
 					a.Position = new Vector2 (a.Position.X, 0);
 				}
 				
-				if (a.Alive && CheckShipCollision (a)) {
+				if (a.Alive && invinisbleTimeLeft <= 0 && CheckSpriteCollision (ship,a) ) {
 					if (a.Index == 1)
 							UpdateScore(20);
 						else if (a.Index == 2)
@@ -734,6 +736,7 @@ namespace AsteroidsHD
 					if (gameType != GameType.Retro)
 						particles.CreatePlayerExplosion (new Vector2 (a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					a.Kill ();
+					destroyed.Add(a);
 					if(a.AsteroidTexture.IsFriend)
 						a.AsteroidTexture.Friend.KilledByCount ++;
 					lives--;
@@ -745,6 +748,11 @@ namespace AsteroidsHD
 						GameOver = true;
 					}
 				}
+			}
+			//Console.WriteLine(asteroids.Count);
+			foreach(var a in destroyed)
+			{
+				asteroids.Remove(a);
 			}
 			
 		}
@@ -776,10 +784,10 @@ namespace AsteroidsHD
 			return false;
 		}
 
-		private bool CheckAsteroidCollision (Sprite asteroid, Sprite bullet)
+		private bool CheckSpriteCollision (Sprite sprite1, Sprite sprite2)
 		{
-			Vector2 position1 = asteroid.Position;
-			Vector2 position2 = bullet.Position;
+			Vector2 position1 = sprite1.Position;
+			Vector2 position2 = sprite2.Position;
 			
 			float Cathetus1 = Math.Abs (position1.X - position2.X);
 			float Cathetus2 = Math.Abs (position1.Y - position2.Y);
@@ -789,10 +797,14 @@ namespace AsteroidsHD
 			
 			distance = (float)Math.Sqrt (Cathetus1 + Cathetus2);
 			
+			int max = Math.Max(sprite1.Width,sprite2.Width) ;
+			int min = Math.Min(sprite1.Width,sprite2.Width);
+			//int width = min + (max - min) / 2;
+			int width = sprite1.Width + (sprite2.Width - sprite1.Width) / 2;
 			//if(asteroid == asteroids[0])
 			//	Console.WriteLine(distance + " : " + asteroid.Width);
-			if ((int)distance < asteroid.Width / 2) {
-				//Console.WriteLine(distance + "," + asteroid.Width + " : " + asteroid.Position + "," + bullet.Position);
+			if ((int)distance < width) {
+				//Console.WriteLine(distance + "," + sprite1.Width + " : " + sprite1.Position + "," + sprite2.Position);
 				return true;
 			} else
 				return false;
@@ -845,7 +857,7 @@ namespace AsteroidsHD
 				}
 				
 				foreach (Asteroid a in asteroids) {
-					if (a.Alive && CheckAsteroidCollision (a, b)) {
+					if (a.Alive && CheckSpriteCollision (a, b)) {
 						if (a.Index == 1)
 							UpdateScore(20);
 						else if (a.Index == 2)
@@ -889,6 +901,7 @@ namespace AsteroidsHD
 			
 			foreach (Asteroid a in destroyed) {
 				SplitAsteroid (a,gameTime);
+				asteroids.Remove(a);
 			}
 		}
 
@@ -1007,6 +1020,16 @@ namespace AsteroidsHD
 			var hSize = myFont.MeasureString(highScoreText);
 			Vector2 highScorePos = new Vector2(ScreenWidth - 10 - hSize.X,10);			
 			spriteBatch.DrawString (myFont, highScoreText, highScorePos, Color.White);
+			var levelString = "Level";
+			var lString = level.ToString();
+			var levelSize = myFont.MeasureString(levelString);
+			var lSize = myFont.MeasureString(lString);
+			
+			Vector2 levelPos = new Vector2((ScreenWidth - levelSize.X )/2,10);
+			Vector2 lPos = new Vector2((ScreenWidth - lSize.X )/2,10 + levelSize.Y);
+			
+			spriteBatch.DrawString(myFont,levelString,levelPos,Color.White);
+			spriteBatch.DrawString(myFont,lString,lPos,Color.White);
 			
 			Rectangle shipRect;
 			/*

@@ -4,27 +4,52 @@ namespace AsteroidsHD
 {
 	public class AsteroidTexture
 	{
-		public AsteroidTexture (GraphicsDevice graphicsDevice,string file,Friend friend)
+		private GraphicsDevice GraphicsDevice;
+		public AsteroidTexture (GraphicsDevice graphicsDevice, string file, Friend friend)
 		{
 			TextureFile = file;
 			Friend = friend;
 			IsFriend = friend != null;
-			initialize(graphicsDevice);
+			GraphicsDevice = graphicsDevice;
+			//initialize(graphicsDevice);
 		}
-		public AsteroidTexture(GraphicsDevice graphicsDevice,string file) : this(graphicsDevice,file,null)
+		public AsteroidTexture (GraphicsDevice graphicsDevice, string file) : this(graphicsDevice, file, null)
 		{
 			
 		}
-		
-		private void initialize(GraphicsDevice graphicsDevice)
+
+		private void Initialize ()
 		{
-			Texure = Texture2D.FromFile (graphicsDevice, TextureFile, 60, 60);
+			if (texture == null)
+				texture = Texture2D.FromFile (GraphicsDevice, TextureFile, 60, 60);
 		}
-		
-		public bool IsFriend {get;set;}
-		public Friend Friend {get;set;}
-		public string TextureFile {get;set;} 
-		public Texture2D Texure {get;set;}
+
+		public bool IsFriend { get; set; }
+		public Friend Friend { get; set; }
+		public string TextureFile { get; set; }
+		private Texture2D texture;
+		public Texture2D Texture {
+			get {
+				if (texture == null)
+					Initialize ();
+				return texture;
+			}
+		}
+		private int useCount = 0;
+		public void InUse()
+		{
+			useCount ++;
+		}
+		public void Done()
+		{
+			useCount --;
+			if(useCount == 0)
+			{
+				Console.WriteLine("disposing texture");
+				texture.Dispose();
+			}
+			texture = null;
+		}
 	}
 }
 

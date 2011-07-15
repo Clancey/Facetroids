@@ -25,7 +25,11 @@ namespace AsteroidsHD
 		{
 			// For debugging
 			var asteroids = Util.BaseDir + "/Documents/asteroids.db";
-			//System.IO.File.Delete (collaboratedb);
+			if(Settings.DbVersion < 1)
+			{
+				System.IO.File.Delete (asteroids);
+				Settings.DbVersion = 1;
+			}
 			Main = new Database (asteroids);
 		}
 		

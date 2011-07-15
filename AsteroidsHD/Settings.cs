@@ -55,6 +55,28 @@ namespace AsteroidsHD
 			set{prefs.SetBool(!value,"useSound");}
 		}
 		
+		public static int DbVersion
+		{
+			get{return 	prefs.IntForKey("dbVersion");}
+			set{prefs.SetInt(value,"dbVersion");}
+		}
+		
+		
+		public static int Score 
+		{
+			get{return prefs.IntForKey("lastScore");}
+			set{prefs.SetInt(value,"lastScore");}
+		}
+		public static int Level
+		{
+			get{return prefs.IntForKey("lastLevel");}
+			set{prefs.SetInt(value,"lastLevel");}
+		}
+		public static bool LastScoreSaved
+		{
+			get{return prefs.BoolForKey("lastScoreSaved");}
+			set{prefs.SetBool(value,"lastScoreSaved");}
+		}
 		
 		
 	}

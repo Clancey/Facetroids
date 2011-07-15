@@ -108,12 +108,12 @@ namespace AsteroidsHD
             get { return (int)(texture.Height * Scale); }
         }
 
-        public void Create()
+        public virtual void Create()
         {
             alive = true;
         }
 
-        public void Kill()
+        public virtual void Kill()
         {
             alive = false;
         }

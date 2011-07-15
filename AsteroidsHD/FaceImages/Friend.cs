@@ -8,7 +8,7 @@ namespace AsteroidsHD
 		public Friend ()
 		{
 		}
-		[PrimaryKey]
+		[PrimaryKey,AutoIncrement]
 		public int RecordId {get;set;}
 		public string OwnerID {get;set;}
 		public string ID {get;set;}
@@ -20,7 +20,7 @@ namespace AsteroidsHD
 	
 	public class Face
 	{
-		[PrimaryKey]
+		[PrimaryKey,AutoIncrement]
 		public int RecordId {get;set;}
 		public string Img {get;set;}
 		public string FriendId {get;set;}

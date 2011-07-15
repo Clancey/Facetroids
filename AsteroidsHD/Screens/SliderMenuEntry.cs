@@ -9,6 +9,7 @@ namespace AsteroidsHD
 		public Action<float> ValueChanged {get;set;}
 		public SliderMenuEntry (string header,float value,ScreenManager screenManager) : base (header)
 		{
+			Console.WriteLine("Creating slider");
 			slider = new Slider(screenManager);
 			slider.Value = value;
 			slider.ValueChanged += delegate(object sender, EventArgs e) {

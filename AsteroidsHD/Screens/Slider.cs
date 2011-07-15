@@ -13,7 +13,7 @@ namespace AsteroidsHD
 			this.MinValue = .1f;
 			this.MaxValue = 1f;
 			ScreenManager = screenManager;
-			
+			Console.WriteLine("is window null?" + Guide.Window == null);
 			Guide.Window.AddSubview(this);
 			//ScreenManager.Game.Window.AddSubview(this);
 			//UIApplication.SharedApplication.KeyWindow.AddSubview(this);

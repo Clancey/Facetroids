@@ -46,7 +46,10 @@ namespace AsteroidsHD
 		private int color = 0;
 		public void ChangeColor()
 		{
+			
+			Console.WriteLine("changing background");
 			string image = "PrimaryBackground";
+			
 			switch(color)
 			{
 			case 1:
@@ -65,6 +68,8 @@ namespace AsteroidsHD
 					break;
 			}
 			
+			//if(t2dBackground == null)
+				//t2dBackground.Dispose();
 			t2dBackground = content.Load<Texture2D>(image);
 			color ++;
 			if(color >4)
@@ -117,6 +122,9 @@ namespace AsteroidsHD
         public override void UnloadContent()
         {
             content.Unload();
+			
+			t2dBackground.Dispose();
+			t2dParallax.Dispose();
         }
 
 
@@ -163,51 +171,61 @@ namespace AsteroidsHD
 
             spriteBatch.End();
         }
-		
+		const int offset = 40;
 		public void Draw(SpriteBatch spriteBatch)
         {
             // Draw the background panel, offset by the player's location
-            spriteBatch.Draw(
+			int curH = 0;
+			while(curH < iViewportHeight)
+			{
+			spriteBatch.Draw(
                 t2dBackground,
                 new Rectangle(-1 * iBackgroundOffsetX, 
-                              iBackgroundOffsetY , iBackgroundWidth, 
-                              iViewportHeight + 40), 
+                              iBackgroundOffsetY  + curH, iBackgroundWidth, 
+                              iBackgroundHeight), 
                 Color.White);
-            
+				curH += iBackgroundHeight;
+			}
+			
             // If the right edge of the background panel will end 
             // within the bounds of the display, draw a second copy 
             // of the background at that location.
+			curH = 0;
+			while(curH < iViewportHeight)
+			{
             if (iBackgroundOffsetX > iBackgroundWidth-iViewportWidth) { 
                 spriteBatch.Draw(
                     t2dBackground,
                     new Rectangle(
                       (-1 * iBackgroundOffsetX) + iBackgroundWidth, 
-                      iBackgroundOffsetY, 
+                      iBackgroundOffsetY + curH, 
                       iBackgroundWidth,
-                      iViewportHeight+ 40), 
+                      iBackgroundHeight), 
                     Color.White); }
+				curH += iBackgroundHeight;
+			}
 			
-			if(iBackgroundOffsetY > iBackgroundHeight - iViewportHeight -40){
+			if(iBackgroundOffsetY > iBackgroundHeight - iViewportHeight -offset){
                 spriteBatch.Draw(
                     t2dBackground,
                     new Rectangle(
                       -1 * iBackgroundOffsetX, 
-                      (  iBackgroundOffsetY) - iBackgroundHeight, 
+                      (  iBackgroundOffsetY) - iBackgroundHeight -offset, 
                       iBackgroundWidth,
-                      iViewportHeight + 40), 
+                      iBackgroundHeight + offset), 
                     Color.White); }
 			
 			
 			
 			
-			if(iBackgroundOffsetY > iBackgroundHeight - iViewportHeight - 40 && iBackgroundOffsetX > iBackgroundWidth-iViewportWidth){
+			if(iBackgroundOffsetY > iBackgroundHeight - iViewportHeight - offset && iBackgroundOffsetX > iBackgroundWidth-iViewportWidth){
                 spriteBatch.Draw(
                     t2dBackground,
                     new Rectangle(
                       (-1 * iBackgroundOffsetX) + iBackgroundWidth, 
-                      (  iBackgroundOffsetY) - iBackgroundHeight, 
+                      (  iBackgroundOffsetY) - iBackgroundHeight -offset, 
                       iBackgroundWidth,
-                      iViewportHeight + 40), 
+                      iBackgroundHeight + offset), 
                     Color.White); }
 			
  

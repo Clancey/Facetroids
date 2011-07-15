@@ -20,12 +20,13 @@ namespace AsteroidsHD
 			//DataAccess.GetFriends();
 			//FaceDetection.DetectFaces();
 			UIApplication.SharedApplication.ApplicationSupportsShakeToEdit = true;
-			//var gc = new GamerServicesComponent(game);
+			var gc = new GamerServicesComponent(game);
 
 			if(Settings.IsFirstRun)
 			{
 				Settings.Sensativity = .56f;
 				Settings.IsFirstRun = false;
+				Settings.LastScoreSaved = true;
 			}
 			//Guide
 		}

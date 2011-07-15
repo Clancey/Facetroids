@@ -45,6 +45,11 @@ namespace AsteroidsHD
 				if(isSubmiting)
 					return;
 				isSubmiting = true;
+				if(!Settings.LastScoreSaved)
+				{
+					Database.Main.Insert(new score(Settings.Score,Settings.Level,Settings.GameType,DateTime.Now));
+					Settings.LastScoreSaved = true;
+				}
 			}
 			Thread thread = new Thread(submitScores);
 			thread.Start();
@@ -57,7 +62,7 @@ namespace AsteroidsHD
 			{
 				//Thread.Sleep(5000);
 				scoresToSend = Database.Main.Table<score>().Where(x=> x.Submited != true).ToList();
-				
+
 				Console.WriteLine("Scores Remaing:" + scoresToSend.Count);
 				if(scoresToSend.Count> 0)
 					submitNextScore();
@@ -101,6 +106,7 @@ namespace AsteroidsHD
 			get{ return ((Program)UIApplication.SharedApplication.Delegate).game;}	
 		}
 		
+
 		internal static AsteroidsHD.BackgroundScreen BackgroundScreen = new AsteroidsHD.BackgroundScreen();
 	}
 }

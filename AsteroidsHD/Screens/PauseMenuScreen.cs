@@ -12,6 +12,7 @@
 using Microsoft.Xna.Framework;
 #else
 using Microsoft.Xna.Framework;
+using System;
 #endif
 
 #endregion
@@ -35,12 +36,14 @@ namespace AsteroidsHD
             // Flag that there is no need for the game to transition
             // off when the pause menu is on top of it.
             IsPopup = true;
+			Console.WriteLine("pause menu created");
 
         }
 		SliderMenuEntry slider;
 		MenuEntry useSound;
 		public override void LoadContent ()
 		{
+			Console.WriteLine("loading content");
 			base.LoadContent();	
             // Create our menu entries.
             MenuEntry resumeGameMenuEntry = new MenuEntry("Resume Game");
@@ -51,7 +54,9 @@ namespace AsteroidsHD
 				Settings.UseSound = !Settings.UseSound;	
 				setTitles();
 			};
+			Console.WriteLine("Setting Titles");
 			setTitles();
+			
             slider = new SliderMenuEntry("Sensitivity",Settings.Sensativity,ScreenManager);
 			
 			slider.ValueChanged += (value)=>
@@ -61,7 +66,7 @@ namespace AsteroidsHD
             // Hook up menu event handlers.
             resumeGameMenuEntry.Selected += OnGetFacebook;
             quitGameMenuEntry.Selected += QuitGameMenuEntrySelected;
-			
+			Console.WriteLine("adding entries");
             // Add entries to the menu.
             MenuEntries.Add(resumeGameMenuEntry);
 			MenuEntries.Add(slider);
