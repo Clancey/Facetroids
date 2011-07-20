@@ -78,6 +78,7 @@ namespace AsteroidsHD
 			Console.WriteLine (formattedUri);
 			var jsonResponse = PostToWall (formattedUri);
 			Console.WriteLine (jsonResponse.ToString ());
+			
 			//parseFriends (jsonResponse);
 		}
 
@@ -128,6 +129,13 @@ namespace AsteroidsHD
 						Database.Main.Insert(friend);
 					}
 					
+					if(friend.LastFacebookPost < DateTime.Now.AddDays(-1))
+					{
+						PostOnFriendsWall(jid);
+						friend.LastFacebookPost = DateTime.Now;
+						Database.Main.Update(friend);
+					}
+					
 				}
 				/*
 				if (images.Count >= 30) {
@@ -139,12 +147,11 @@ namespace AsteroidsHD
 				images.Add (imgURl);
 				*/				
 				//faceRest.faces_detect(new List<string>{imgURl},null,null,null);
-				var img = ImageStore.RequestProfilePicture (jid.ToString (), imgURl, false, Notifier);
+				var img = ImageStore.RequestProfilePicture (jid.ToString (), imgURl, true, Notifier);
 				if (img != null) {
 					UpdatedImage (jid.ToString ());
 				}
 				Console.WriteLine(message);
-				//PostOnFriendsWall(jid);
 				//Console.WriteLine (juser.ToString ());
 			}
 			
@@ -161,6 +168,11 @@ namespace AsteroidsHD
 				string id = url.Substring (26);
 				id = id.Substring (0, id.IndexOf ("/"));
 				int count = 0;
+				
+				lock (Database.Main)
+				{
+					Database.Main.Execute("Delete from Face where FriendId = ?",id);
+				}
 				foreach (var tag in photo.tags) {
 					Face face = new Face ();
 					var increase = 1.1f;
@@ -169,8 +181,8 @@ namespace AsteroidsHD
 					face.Height = width;
 					face.Width = width;
 					var file = id + (count > 0 ? " -" + count : "") + ".png";
-					face.OrgImage = Path.Combine (ImageStore.PicDir, id + ".png");
-					face.Img = Path.Combine (ImageStore.RoundedPicDir, file);
+					face.OrgImage =  id + ".png";
+					face.Img = file;
 					face.Cx = photo.width * ((tag.center.x) / 100);
 					face.Cy = photo.height * ((tag.center.y) / 100);
 					face.Roll = tag.roll;
@@ -231,11 +243,11 @@ namespace AsteroidsHD
 			
 			  var parameters = ""
             .AppendQueryString("name", "Facetroids")
-            .AppendQueryString("link", "http://www.google.com")
+            .AppendQueryString("link", "http://goo.gl/VXpxI")
             .AppendQueryString("caption", "Facetroids")
             //.AppendQueryString("description", "Amazing Iphon")
             .AppendQueryString("source", "http://blackballsoftware.com/images/whitetheme/headerwhite.png")
-            .AppendQueryString("actions", "{\"name\": \"View on Rate-It\", \"link\": \"http://www.google.com\"}")
+            .AppendQueryString("actions", "{\"name\": \"View on Rate-It\", \"link\": \"http://goo.gl/VXpxI\"}")
             //.AppendQueryString("privacy", "{\"value\": \"EVERYONE\"}")
             .AppendQueryString("message",  HttpUtility.UrlEncode(message));
 			

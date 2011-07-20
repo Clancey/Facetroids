@@ -35,10 +35,17 @@ namespace AsteroidsHD
 
             graphics.PreferredBackBufferWidth = BufferWidth;
             graphics.PreferredBackBufferHeight = BufferHeight;
+			graphics.PreferMultiSampling = true;
 			
 			graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
-            // Create the screen manager component.
+
+        }
+		
+		protected override void Initialize ()
+		{
+			base.Initialize ();
+			            // Create the screen manager component.
             ScreenManager = new ScreenManager(this);
 
             Components.Add(ScreenManager);
@@ -46,7 +53,7 @@ namespace AsteroidsHD
             // Activate the first screens.
             ScreenManager.AddScreen(Util.BackgroundScreen, null);
             ScreenManager.AddScreen(new MainMenuScreen(), null);
-        }
+		}
 
 
         #endregion

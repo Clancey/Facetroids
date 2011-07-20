@@ -106,6 +106,11 @@ namespace AsteroidsHD
 			get{ return ((Program)UIApplication.SharedApplication.Delegate).game;}	
 		}
 		
+		public static string VersionString
+		{
+			get {return ((Program)UIApplication.SharedApplication.Delegate).Version;}
+		}
+		
 
 		internal static AsteroidsHD.BackgroundScreen BackgroundScreen = new AsteroidsHD.BackgroundScreen();
 	}

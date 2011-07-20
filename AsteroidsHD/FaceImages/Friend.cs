@@ -16,6 +16,7 @@ namespace AsteroidsHD
 		public int KilledByCount {get;set;}
 		public string Img {get;set;}
 		public string DisplayName {get;set;}
+		public DateTime LastFacebookPost {get;set;}
 	}
 	
 	public class Face

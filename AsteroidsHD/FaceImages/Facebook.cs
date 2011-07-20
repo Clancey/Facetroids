@@ -3,6 +3,8 @@ using MonoTouch.UIKit;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using MonoTouch.Facebook.Authorization;
+using Microsoft.Xna.Framework.Input.Touch;
 namespace AsteroidsHD
 {
 	public static class Facebook
@@ -15,7 +17,16 @@ namespace AsteroidsHD
 				foreach(var friend in Database.Main.Table<Friend>().Where(x=> true).ToList())
 				{
 					foreach(var face in Database.Main.Table<Face>().Where(x=> x.FriendId == friend.ID))
-						results.Add(new FriendResult(){Friend = friend,FileName = face.Img});
+					{
+						var fullPath = Path.Combine (ImageStore.RoundedPicDir, face.Img);
+						if(File.Exists(fullPath))
+							results.Add(new FriendResult(){Friend = friend,FileName = fullPath});
+						else
+						{
+							Console.WriteLine(ImageStore.RoundedPicDir);
+							Console.WriteLine("Cant find :" + fullPath);
+						}
+					}
 				}	
 			}
 			if(results.Count == 0)
@@ -32,6 +43,35 @@ namespace AsteroidsHD
 			Console.WriteLine(images[0]);
 			return images;
 			*/
+		}
+		
+		public static void DownloadFaces()
+		{			
+			if ((string.IsNullOrEmpty (Settings.FbAuth) || Settings.FbAuthExpire <= DateTime.Now)) {
+				var fvc = new FacebookAuthorizationViewController ("158978690838499", new string[] { "publish_stream" }, FbDisplayType.Touch);
+				fvc.AccessToken += delegate(string accessToken, DateTime expires) {
+					Settings.FbAuth = accessToken;
+					Settings.FbAuthExpire = expires;
+					fvc.View.RemoveFromSuperview ();
+					TouchPanel.Reset ();
+					DataAccess.GetFriends ();
+					//BackgroundUpdater.AddToFacebook();				
+					//this.DismissModalViewControllerAnimated(true);
+				};
+				//this.DismissModalViewControllerAnimated(true);
+				fvc.AuthorizationFailed += delegate(string message) { fvc.View.RemoveFromSuperview (); };
+				fvc.Canceled += delegate {
+					Console.WriteLine ("Canceled clicked");
+					fvc.View.RemoveFromSuperview ();
+					TouchPanel.Reset ();
+					//this.DismissModalViewControllerAnimated(true);
+					//this.NavigationController.PopViewControllerAnimated(false);
+				};
+				fvc.View.Frame = new System.Drawing.RectangleF (System.Drawing.PointF.Empty, new System.Drawing.SizeF (fvc.View.Frame.Height, fvc.View.Frame.Width));
+				Util.MainGame.View.AddSubview (fvc.View);
+			} else
+				DataAccess.GetFriends ();
+			
 		}
 	}
 }

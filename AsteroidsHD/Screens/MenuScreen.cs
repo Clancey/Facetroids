@@ -217,7 +217,7 @@ namespace AsteroidsHD
             SpriteFont font = ScreenManager.Font;
 			
 			var center = ScreenManager.Width / 2;
-            Vector2 position = new Vector2(center, 140);
+            Vector2 position = new Vector2(center, Util.IsIpad ? 250 : 140);
 
             // Make the menu slide into place during transitions, using a
             // power curve to make things look more interesting (this makes

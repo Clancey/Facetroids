@@ -47,6 +47,10 @@ namespace AsteroidsHD
 		public static bool IsFirstRun {			
 			get{return !prefs.BoolForKey("isFirtRun");}
 			set{prefs.SetBool(!value,"isFirtRun");}
+		}		
+		public static bool HasSeenTutorial {			
+			get{return prefs.BoolForKey("HasSeenTutorial");}
+			set{prefs.SetBool(value,"HasSeenTutorial");}
 		}
 		
 		
@@ -77,7 +81,6 @@ namespace AsteroidsHD
 			get{return prefs.BoolForKey("lastScoreSaved");}
 			set{prefs.SetBool(value,"lastScoreSaved");}
 		}
-		
 		
 	}
 }

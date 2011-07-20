@@ -112,10 +112,11 @@ namespace AsteroidsHD
 		
 		internal static void SaveFace(Face face)
 		{
-			if(!File.Exists(face.OrgImage))
+			var filePath = Path.Combine (ImageStore.PicDir,face.OrgImage);
+			if(!File.Exists(filePath))
 				return;
 			
-			UIImage image = UIImage.FromFile(face.OrgImage);
+			UIImage image = UIImage.FromFile(filePath);
 			var path = UIBezierPath.FromOval(new RectangleF(0,0,face.Rect.Width,face.Rect.Height)).CGPath;
 			UIGraphics.BeginImageContext(new SizeF(face.Width,face.Height));
 			var c = UIGraphics.GetCurrentContext ();
@@ -129,9 +130,10 @@ namespace AsteroidsHD
 			var bytes = UIGraphics.GetImageFromCurrentImageContext ().AsPNG();
             UIGraphics.EndImageContext ();
 			NSError err;
-			if(File.Exists(face.Img))
-				File.Delete(face.Img);
-			bytes.Save (face.Img, false, out err);
+			var newFilePath = Path.Combine (ImageStore.RoundedPicDir, face.Img);
+			if(File.Exists(newFilePath))
+				File.Delete(newFilePath);
+			bytes.Save (newFilePath, false, out err);
 			//CGContextTranslateCTM (ctx, -center.x, -center.y);
 		}
 		

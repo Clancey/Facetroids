@@ -8,10 +8,6 @@
 		<data>
 		wkkrTyf0t1Tr7IYwFztz017PQEk=
 		</data>
-		<key>Content/BANNER.bmp</key>
-		<data>
-		7hFTu7VS21jJlYZJ3Wpb9m34zLY=
-		</data>
 		<key>Content/Fonts/SpriteFont1.xnb</key>
 		<data>
 		/JEXYSfG/sM1V06//WlRAv60y6M=
@@ -24,25 +20,9 @@
 		<data>
 		LlSKL+d1mDtanQTj32ouW+MS1Ac=
 		</data>
-		<key>Content/PrimaryBackground-green.png</key>
-		<data>
-		5JHVkb4qHZSrDhiWF/2mzlAPmlY=
-		</data>
-		<key>Content/PrimaryBackground-purple.png</key>
-		<data>
-		eIJ492FkGL5jno0yD8qGwTDThuc=
-		</data>
-		<key>Content/PrimaryBackground-teal.png</key>
-		<data>
-		L5HdnikM0QefEb12cfgVIX4JW7E=
-		</data>
-		<key>Content/PrimaryBackground-yellow.png</key>
-		<data>
-		NyzqbEI8iKyXbgDbj9f8TAz4fmU=
-		</data>
 		<key>Content/PrimaryBackground.png</key>
 		<data>
-		qnMe0Izroi/c9gVfhPTYYkQ57+k=
+		Ligx6RMKIl1kVaksJtwRxo/AdwY=
 		</data>
 		<key>Content/Retro/large1.pdf</key>
 		<data>
@@ -88,6 +68,14 @@
 		<data>
 		/UfaQ0gxFV664OcsrAymLj+p2+E=
 		</data>
+		<key>Content/Tutorial/shootScreen.png</key>
+		<data>
+		nQw7RKgnw5MxQt4yaqFbhLXFH1Q=
+		</data>
+		<key>Content/Tutorial/thrustScreen.png</key>
+		<data>
+		pr81IbMZgbxw2RJMQq+SWxgSRvE=
+		</data>
 		<key>Content/asteroid.png</key>
 		<data>
 		TO9gCwVdpjpe3Az9OA+pVmrVrcQ=
@@ -95,10 +83,6 @@
 		<key>Content/asteroid@2x.png</key>
 		<data>
 		ADD8FKP/C5yWDgBRMFKZLLNygJo=
-		</data>
-		<key>Content/background.png</key>
-		<data>
-		W3gTHxecKSHImsMdy5lJCP7uIPY=
 		</data>
 		<key>Content/blank.png</key>
 		<data>
@@ -160,9 +144,29 @@
 		<data>
 		FT2vfqs5N9pdI8Ha+MmmKnnksaM=
 		</data>
+		<key>Default-Landscape@2x~iphone.png</key>
+		<data>
+		se40c6rB8hisJz7MmQ4E3tkMSdY=
+		</data>
+		<key>Default-Landscape~ipad.png</key>
+		<data>
+		oKTkMvzeOGfsVUWOfOOEYDGbPk0=
+		</data>
+		<key>Default-Landscape~iphone.png</key>
+		<data>
+		Dm+hXUMFCr3so3bPvtLt71isYBw=
+		</data>
+		<key>Default.png</key>
+		<data>
+		FcizrdYbh3YAbyU1bfSir1y0DH8=
+		</data>
+		<key>Default@2x.png</key>
+		<data>
+		TpZ049bJpJRu9jkDaNhHvmrmXUo=
+		</data>
 		<key>Faceteroids.exe</key>
 		<data>
-		A5k/fY9Ky824IJmf7TMLl+4FbWc=
+		jVSLuWZVfwfP0Yktk8nyK3dH46k=
 		</data>
 		<key>Icon.png</key>
 		<data>
@@ -174,19 +178,19 @@
 		</data>
 		<key>Mono.Security.dll</key>
 		<data>
-		x7+AyYzvyJGS+45XIlgntmswRIM=
+		M+c41Ih+fR/OLOT6g3zozVLjBTY=
 		</data>
 		<key>MonoGame.Framework.dll</key>
 		<data>
-		PUd5T/qZPSfA0m5MBRDhq4ock2E=
+		TY9G8D/z5Ci+7DtO20q3z7xf1Dg=
 		</data>
 		<key>NewtonsoftJsonMonoTouch.dll</key>
 		<data>
-		dBVjz9QlDjxWr0XdVG4Ay7C3QEE=
+		69aXvoXLjY4Y0DwV3+1yFQi5TeE=
 		</data>
 		<key>OpenTK.dll</key>
 		<data>
-		+pc80w/fIp90FjUuv9E+2fHx8h0=
+		kJPmByYOxyo94URqM9qQzXR9c58=
 		</data>
 		<key>OpenTK.dll.config</key>
 		<data>
@@ -198,39 +202,39 @@
 		</data>
 		<key>System.Core.dll</key>
 		<data>
-		77hGkMSU8YNa+Ad8gr+1kwDUcs8=
+		pGgHgO9uYwQPtKLOEfGygKubzmw=
 		</data>
 		<key>System.Json.dll</key>
 		<data>
-		yaZ6uZ6M0mlDgFJudeVQT16zAFM=
+		dbUo0qVw2PdWdI1CGBKJNiCTi4w=
 		</data>
 		<key>System.Runtime.Serialization.dll</key>
 		<data>
-		dLhvo+BocVR8MGg9YMlH0LHSAvY=
+		YCU18BOJYqvSJ+gMiLLblzn0oWQ=
 		</data>
 		<key>System.ServiceModel.Web.dll</key>
 		<data>
-		VHuPKWU8pbRdwhqj3GyyFpjXwdc=
+		aA6GrAhhnjpP8EL4QPJ2pxheloE=
 		</data>
 		<key>System.Xml.dll</key>
 		<data>
-		+gFtalGLIbb9frwoUQY0cO16fgY=
+		jRCasoxyez+cZwx8XQwCouSyric=
 		</data>
 		<key>System.dll</key>
 		<data>
-		uZhwFItBv7R5pUcOWQabkjfojWk=
+		CQkUdyi2ggAG9s2QtqFXblU+r2s=
 		</data>
 		<key>embedded.mobileprovision</key>
 		<data>
-		NpNS2I4VncyqzJXenHhLzVkEoYU=
+		Fa9atxUR+1yQjfXK7+3E6ynh1T0=
 		</data>
 		<key>monotouch.dll</key>
 		<data>
-		dqYmMYN2Vvd+R8fgg/Pr/rTfN0w=
+		lL3kLF1nQv7k+sUG78XkEyCt/7I=
 		</data>
 		<key>mscorlib.dll</key>
 		<data>
-		kCWqpiFy0S74H9wYW1WNNdZpH9Y=
+		kSRtnZrl3B81zs0xQw3xkd04tq4=
 		</data>
 	</dict>
 	<key>rules</key>

@@ -42,8 +42,8 @@ namespace AsteroidsHD
 	/// </summary>
 	class GameplayScreen : GameScreen
 	{
-		
-		bool hasAsteroids = true;
+
+		public bool IsTutorial = true;
 		#region Fields
 		ContentManager Content;
 		Ship ship;
@@ -59,12 +59,12 @@ namespace AsteroidsHD
 		double invinisbleTimeLeft = 0;
 		double shipResetSeconds = 0;
 		double invinsibleResetTime = 3;
-		long LocalHighScore = 0 ;
+		long LocalHighScore = 0;
 		bool brokeHighScore = false;
 		int baseAsteroids = Util.IsIpad ? 5 : 3;
 		const int freeManPoints = 10000;
 		int pointsForFreeMan = 0;
-		
+
 		bool isFreeManVisible = false;
 		Sprite freeManSprite;
 		double freeManResetTime = 10;
@@ -76,7 +76,7 @@ namespace AsteroidsHD
 
 		Sprite bullet;
 		List<Sprite> bullets = new List<Sprite> ();
-		Texture2D gamePadTexture,leftButtonTexture,rightButtonTexture,upButtonTexture,pauseButtonTexture;
+		Texture2D gamePadTexture, leftButtonTexture, rightButtonTexture, upButtonTexture, pauseButtonTexture;
 		List<AsteroidTexture> asteroidTextures = new List<AsteroidTexture> ();
 		List<Asteroid> asteroids = new List<Asteroid> ();
 
@@ -104,8 +104,9 @@ namespace AsteroidsHD
 		/// <summary>
 		/// Constructor.
 		/// </summary>
-		public GameplayScreen ()
+		public GameplayScreen (bool isTutorial)
 		{
+			IsTutorial = isTutorial;
 			TransitionOnTime = TimeSpan.FromSeconds (1.5);
 			TransitionOffTime = TimeSpan.FromSeconds (0.5);
 			ShouldPause = true;
@@ -144,7 +145,7 @@ namespace AsteroidsHD
 			level = 1;
 			score = 0;
 			pointsForFreeMan = 0;
-			lives = 3;
+			lives = IsTutorial ? 3: 4;
 			bullets.Clear ();
 			LocalHighScore = Settings.HighScore;
 			ScreenHeight = (int)UIScreen.MainScreen.Bounds.Width;
@@ -154,8 +155,8 @@ namespace AsteroidsHD
 			invinisbleTimeLeft = -1;
 			GameOver = false;
 			isFreeManVisible = false;
-			if(particles != null)
-				particles.Reset();
+			if (particles != null)
+				particles.Reset ();
 		}
 
 
@@ -183,13 +184,13 @@ namespace AsteroidsHD
 			//spriteBatch = ScreenManager.SpriteBatch;
 			//AwesomeAsteroid = ObjModelLoader.LoadFromFile ("Models/rock.obj");
 			//asteroid = Texture2D.FromFile (ScreenManager.GraphicsDevice, "Models/rock.jpg", 256, 256);
-			pauseButtonTexture = Content.Load<Texture2D>("pause.png");
+			pauseButtonTexture = Content.Load<Texture2D> ("pause.png");
 			var ship1t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship.pdf";
 			var ship2t = gameType == GameType.Retro ? "Content/Retro/ship.pdf" : "Content/ship-thrust.pdf";
 			var ship1 = Texture2D.FromFile (ScreenManager.GraphicsDevice, ship1t, 35, 35);
 			var ship2 = Texture2D.FromFile (ScreenManager.GraphicsDevice, ship2t, 35, 35);
 			ship = new Ship (ship1, ship2);
-			freeManSprite = new Sprite(ship2);
+			freeManSprite = new Sprite (ship2);
 			//ship.Scale = .05f;
 			bullet = new Sprite (Content.Load<Texture2D> ("shot-frame1"));
 			//bullet.Scale = .05f;
@@ -204,20 +205,19 @@ namespace AsteroidsHD
 			
 			//Console.WriteLine (gamePadLeft);
 			// Set the virtual GamePad
-			GamePad.ButtonsDefinitions.Clear();
+			GamePad.ButtonsDefinitions.Clear ();
 			var gamePadH = ScreenHeight - 100;
-			var gamePadLeft = ScreenWidth -80;
+			var gamePadLeft = ScreenWidth - 80;
 			
 			ButtonDefinition XButton = new ButtonDefinition ();
 			XButton.Texture = pauseButtonTexture;
 			XButton.Position = new Vector2 (gamePadLeft, 0 + 10 + (int)myFont.FontSize + 10);
 			XButton.Type = Buttons.X;
-			XButton.TextureRect = new Rectangle (0, 0, 30, 30);	
+			XButton.TextureRect = new Rectangle (0, 0, 30, 30);
 			GamePad.ButtonsDefinitions.Add (XButton);
 			
 			
-			if(!useAccel)
-			{
+			if (!useAccel) {
 				//Setup the controller if they are not using the accelerometer
 				gamePadTexture = Content.Load<Texture2D> ("gamepad.png");
 				//leftButtonTexture = Content.Load<Texture2D>("leftArrow.png");
@@ -226,7 +226,7 @@ namespace AsteroidsHD
 				//ButtonDefinition left = new ButtonDefinition();
 				//Console.WriteLine (gamePadH);
 				// Set the virtual GamePad
-				/*
+								/*
 				ButtonDefinition BButton = new ButtonDefinition ();
 				BButton.Texture = gamePadTexture;
 				BButton.Position = new Vector2 (gamePadLeft, gamePadH + 10);
@@ -264,8 +264,8 @@ namespace AsteroidsHD
 				GamePad.ButtonsDefinitions.Add (BButton);
 				GamePad.ButtonsDefinitions.Add (AButton);	
 				*/
-				
-			
+
+
 				ThumbStickDefinition thumbStick = new ThumbStickDefinition ();
 				thumbStick.Position = new Vector2 (50, gamePadH);
 				thumbStick.Texture = gamePadTexture;
@@ -274,10 +274,8 @@ namespace AsteroidsHD
 				
 				GamePad.LeftThumbStickDefinition = thumbStick;
 				
-			}
-			else
-			{
-				GamePad.LeftThumbStickDefinition = null;	
+			} else {
+				GamePad.LeftThumbStickDefinition = null;
 			}
 			SetupGame ();
 			
@@ -292,23 +290,23 @@ namespace AsteroidsHD
 			//Console.WriteLine(gameType);
 			asteroidTextures.Clear ();
 			if (gameType == GameType.Modern) {
-				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/asteroid.png"));
+				asteroidTextures.Add (new AsteroidTexture (ScreenManager.GraphicsDevice, "Content/asteroid.png"));
 				return;
 			} else if (gameType == GameType.Facebook) {
 				foreach (var friendResult in Facebook.GetImages ()) {
 					//Console.WriteLine (img);
-					asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice,friendResult.FileName,friendResult.Friend));
+					asteroidTextures.Add (new AsteroidTexture (ScreenManager.GraphicsDevice, friendResult.FileName, friendResult.Friend));
 				}
 				return;
 			}
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/Retro/large" + i + ".pdf"));
+				asteroidTextures.Add (new AsteroidTexture (ScreenManager.GraphicsDevice, "Content/Retro/large" + i + ".pdf"));
 			//60
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/Retro/medium" + i + ".pdf"));
+				asteroidTextures.Add (new AsteroidTexture (ScreenManager.GraphicsDevice, "Content/Retro/medium" + i + ".pdf"));
 			//45
 			for (int i = 1; i < 4; i++)
-				asteroidTextures.Add (new AsteroidTexture(ScreenManager.GraphicsDevice, "Content/Retro/small" + i + ".pdf"));
+				asteroidTextures.Add (new AsteroidTexture (ScreenManager.GraphicsDevice, "Content/Retro/small" + i + ".pdf"));
 			//25
 		}
 
@@ -346,42 +344,37 @@ namespace AsteroidsHD
 				if (GameOver) {
 					asteroids.Clear ();
 					ship.Kill ();
-					lock(Database.Main)
-					{
-						Database.Main.Insert(new score((int)score,level,gameType,DateTime.Now));
+					lock (Database.Main) {
+						Database.Main.Insert (new score ((int)score, level, gameType, DateTime.Now));
 						Settings.LastScoreSaved = true;
-						foreach(var asteroid in asteroidTextures.Where(a=> a.IsFriend).ToList())
-							Database.Main.Update(asteroid.Friend);
-							
+						foreach (var asteroid in asteroidTextures.Where (a => a.IsFriend).ToList ())
+							Database.Main.Update (asteroid.Friend);
+						
 					}
 					string scoreString = "";
-					if(brokeHighScore)
-					{
+					if (brokeHighScore) {
 						Settings.HighScore = (int)score;
 						scoreString = "New High Score: " + score;
-					}
-					else
+					} else
 						scoreString = "Score: " + score;
 					
-					ContinueMenuScreen cont = new ContinueMenuScreen (scoreString);					
+					ContinueMenuScreen cont = new ContinueMenuScreen (scoreString);
 					cont.Continue += delegate { SetupGame (); };
 					ScreenManager.AddScreen (cont, ControllingPlayer);
-					Util.SubmitScores();
+					Util.SubmitScores ();
 					return;
 					
 				}
-							
+				
 				GamePadState gamepastatus = GamePad.GetState (PlayerIndex.One);
 				if (gamepastatus.Buttons.X == ButtonState.Pressed) {
 					ScreenManager.GlobalPause ();
 					return;
-				}
-				else
-				{
+				} else {
 					if (useAccel)
 						updateFromAccelerometer (gameTime, touchState);
 					else
-						updateFromGamePad (gameTime,touchState);
+						updateFromGamePad (gameTime, touchState);
 				}
 				//Console.WriteLine(invinisbleTimeLeft);
 				if (invinisbleTimeLeft > 0) {
@@ -389,15 +382,16 @@ namespace AsteroidsHD
 					//Console.WriteLine ("invinisbleTimeLeft: " + invinisbleTimeLeft);
 				}
 				
-				if(freeManVisibleTimeLeft > 0)
+				if (freeManVisibleTimeLeft > 0)
 					freeManVisibleTimeLeft = freeManResetTime - (gameTime.TotalRealTime.TotalSeconds - freeManResetSeconds);
-				else 
+				else
 					isFreeManVisible = false;
 				
 				UpdateShip ();
 				UpdateAsteroids (gameTime);
 				UpdateBullets (gameTime);
 				AllDead ();
+				UpdateTutorial(gameTime);
 				
 			}
 			
@@ -413,7 +407,7 @@ namespace AsteroidsHD
 		{
 			//PAUSE
 			
-
+			
 			
 			//gameTime.
 			var accelState = Accelerometer.GetState ().Acceleration;
@@ -438,16 +432,13 @@ namespace AsteroidsHD
 						rightSideTouched = true;
 				}
 			}
-			var diff = gameTime.TotalGameTime.TotalMilliseconds - lastAutoShotFired ;
+			var diff = gameTime.TotalGameTime.TotalMilliseconds - lastAutoShotFired;
 			//Console.WriteLine(diff);
-			if (!RightSideTouchedOld && rightSideTouched)
-			{
+			if (!RightSideTouchedOld && rightSideTouched) {
 				FireBullet ();
 				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
-			}
-			else if(rightSideTouched && diff >= autoShootTime)
-			{
-				FireBullet();
+			} else if (rightSideTouched && diff >= autoShootTime) {
+				FireBullet ();
 				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
 			}
 			
@@ -461,45 +452,43 @@ namespace AsteroidsHD
 			
 			
 		}
+
+		private static float WrapAngle (float radians)
+		{
+			while (radians < -MathHelper.Pi) {
+				radians += MathHelper.TwoPi;
+			}
+			while (radians > MathHelper.Pi) {
+				radians -= MathHelper.TwoPi;
+			}
+			return radians;
+		}
 		
-		private static float WrapAngle(float radians) 
-		{ 
-		    while (radians < -MathHelper.Pi) 
-		    { 
-		        radians += MathHelper.TwoPi; 
-		    } 
-		    while (radians > MathHelper.Pi) 
-		    { 
-		        radians -= MathHelper.TwoPi; 
-		    } 
-		    return radians; 
-		} 
 		private void updateFromGamePad (GameTime gameTime, TouchCollection touchState)
 		{
-			float tollerance = .95f;
+			float tollerance = .99f;
 			GamePadState gamepastatus = GamePad.GetState (PlayerIndex.One);
 			var position = new Vector2 (0, 0);
 			//if(gamepastatus.ThumbSticks.Left.Y > tollerance)
 			
 			//if (gamepastatus.ThumbSticks.Left.Y < tollerance)
-			position.X += (int)(gamepastatus.ThumbSticks.Left.X  * 4 * Settings.Sensativity);	
+			position.X += (int)(gamepastatus.ThumbSticks.Left.X * 4 * Settings.Sensativity);
 			
 			//ship.Rotation -= 0.05f * position.X;
-			var maxJoyStick = Math.Max(Math.Abs(gamepastatus.ThumbSticks.Left.Y),Math.Abs(gamepastatus.ThumbSticks.Left.X));
-			var rotation = (float)Math.Atan2((double)gamepastatus.ThumbSticks.Left.X,(double)gamepastatus.ThumbSticks.Left.Y);
-			if(maxJoyStick > 0.1f )
-			{
+			var maxJoyStick = Math.Max (Math.Abs (gamepastatus.ThumbSticks.Left.Y), Math.Abs (gamepastatus.ThumbSticks.Left.X));
+			var rotation = (float)Math.Atan2 ((double)gamepastatus.ThumbSticks.Left.X, (double)gamepastatus.ThumbSticks.Left.Y);
+			if (maxJoyStick > 0.1f) {
 				
 				var rotationSpeed = 0.2f * Settings.Sensativity;
-				float difference = WrapAngle(rotation - ship.Rotation); 
- 
+				float difference = WrapAngle (rotation - ship.Rotation);
+				
 				// clamp that between -turnSpeed and turnSpeed. 
-				difference = MathHelper.Clamp(difference, -rotationSpeed, rotationSpeed); 
+				difference = MathHelper.Clamp (difference, -rotationSpeed, rotationSpeed);
 				
 				// so, the closest we can get to our target is currentAngle + difference. 
 				// return that, using WrapAngle again. 
-				ship.Rotation = WrapAngle(ship.Rotation + difference); 
-
+				ship.Rotation = WrapAngle (ship.Rotation + difference);
+				
 			}
 			
 			var halfScreen = ScreenWidth / 2;
@@ -508,30 +497,36 @@ namespace AsteroidsHD
 			foreach (var touch in touchState) {
 				if (touch.State != TouchLocationState.Released || touch.State != TouchLocationState.Invalid) {
 					if (touch.Position.X / ScreenManager.Scale < halfScreen)
+					{
 						leftSideTouched = true;
+						if(touch.State == TouchLocationState.Pressed && !GamePad.LeftThumbStickDefinition.TextureRect.Contains(touch.Position))
+						{
+							var pos = touch.Position;
+							pos.X /= ScreenManager.Scale;
+							pos.Y /= ScreenManager.Scale;
+							pos.X -= GamePad.LeftThumbStickDefinition.TextureRect.Width / 2;
+							pos.Y -= GamePad.LeftThumbStickDefinition.TextureRect.Height / 2;
+							GamePad.LeftThumbStickDefinition.Position = pos;
+						}
+					}
 					else
 						rightSideTouched = true;
 				}
 			}
 			
-			var diff = gameTime.TotalGameTime.TotalMilliseconds - lastAutoShotFired ;
+			var diff = gameTime.TotalGameTime.TotalMilliseconds - lastAutoShotFired;
 			//Console.WriteLine(diff);
-			if (!RightSideTouchedOld && rightSideTouched)
-			{
+			if (!RightSideTouchedOld && rightSideTouched) {
+				FireBullet ();
+				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
+			} else if (rightSideTouched && diff >= autoShootTime) {
 				FireBullet ();
 				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
 			}
-			else if(rightSideTouched && diff >= autoShootTime)
-			{
-				FireBullet();
-				lastAutoShotFired = gameTime.TotalGameTime.TotalMilliseconds;
-			}
 			
 			
-			//if (gamepastatus.Buttons.B == ButtonState.Pressed && oldGamePadState.Buttons.B == ButtonState.Released)
-			//	FireBullet ();
 			
-			if (maxJoyStick > tollerance)
+			if (maxJoyStick >= tollerance)
 				AccelerateShip ();
 			else
 				DecelerateShip ();
@@ -549,22 +544,119 @@ namespace AsteroidsHD
 			oldGamePadState = gamepastatus;
 			RightSideTouchedOld = rightSideTouched;
 		}
-
+		
+		int tutorialStep=0;
+		int tutorialShootCount = 0;
+		string tutorialText = "";
+		Vector2 tutorialTextPosition = Vector2.Zero;
+		double tutorialStart = 0;
+		float distanceTraveled = 0;
+		
+		private void UpdateTutorial(GameTime gametime)
+		{
+			if(!IsTutorial)
+				return;
+			tutorialTextPosition = new Vector2(ScreenWidth / 2,ScreenHeight / 4);
+			var eTime = (gametime.TotalGameTime.TotalSeconds - tutorialStart);
+			float textScale = .75f;
+			float textSaleInvert = 1 / textScale;
+			if(tutorialStep == 0)
+			{
+				if(tutorialStart == 0)
+					tutorialStart = gametime.TotalGameTime.TotalSeconds;
+				Console.WriteLine(eTime + ":" + tutorialShootCount);
+				if(tutorialShootCount >= 1 && eTime > 3)
+				{
+					tutorialStep ++;
+					tutorialShootCount = 0;
+					tutorialStart = gametime.TotalGameTime.TotalSeconds;
+					return;
+				}
+				tutorialText = "Tap on the right to shoot";	
+			} else if( tutorialStep == 1)	{
+				if(tutorialShootCount >=3 && eTime > 3)
+				{
+					tutorialStep ++;
+					tutorialShootCount = 0;
+					tutorialStart = gametime.TotalGameTime.TotalSeconds;
+					return;
+				}
+				tutorialText = "Press on the right to auto-fire";	
+			} else if(tutorialStep == 2) {
+				Console.WriteLine(distanceTraveled);
+				if(distanceTraveled > 25 && eTime > 3)
+				{
+					tutorialStep ++;
+					distanceTraveled =0;
+					tutorialStart = gametime.TotalGameTime.TotalSeconds;
+					return;
+				}
+				if(Settings.UseAccel)
+					tutorialText = "Press on the left to thrust";	
+				else
+					tutorialText = "Use the joystick to thrust";
+			}
+			else if(tutorialStep == 3) {
+				Console.WriteLine(ship.Rotation);
+				if(Math.Abs(ship.Rotation) > 1 && eTime > 3)
+				{
+					tutorialStep++;					
+					tutorialStart = gametime.TotalGameTime.TotalSeconds;
+					
+					isFreeManVisible = true;
+					freeManSprite.Position = new Vector2((float)((ScreenWidth * .1) + (random.NextDouble() * (ScreenWidth * .8))),(float)((ScreenHeight * .1) + random.NextDouble () * (ScreenHeight * .8)));					
+					freeManVisibleTimeLeft = freeManBlinkTime;
+					freeManResetSeconds = gametime.TotalRealTime.TotalSeconds;
+					return;
+				}
+				if(Settings.UseAccel)
+					tutorialText = "Rotate the device to spin";
+				else
+					tutorialText = "Use the joystick to spin the device";
+			}
+			else if(tutorialStep == 4)
+			{
+				if(eTime > 3 && !isFreeManVisible)
+				{
+					tutorialStep++;					
+					tutorialStart = gametime.TotalGameTime.TotalSeconds;
+					return;					
+				}
+				if(freeManVisibleTimeLeft < 2)
+					freeManResetSeconds = gametime.TotalRealTime.TotalSeconds;
+				tutorialText = "Collect other ships for extra lives";	
+			}
+			else if(tutorialStep == 5)
+			{
+				if(eTime > 4)
+				{
+					IsTutorial = false;
+					SetupGame();
+					Settings.HasSeenTutorial = true;
+					return;
+				}
+				tutorialText = "Get ready to shoot your friends!";
+			}
+			
+			var tutlSize = myFont.MeasureString (tutorialText);
+			tutorialTextPosition.X -= (tutlSize.X /2) / textSaleInvert;
+		}
+		
 		private void AllDead ()
 		{
-			if (asteroids.Count == 0) {
+			if (!IsTutorial && asteroids.Count == 0) {
 				level++;
-				if(gameType != GameType.Retro)
-					Util.BackgroundScreen.ChangeColor();
+				//if(gameType != GameType.Retro)
+				//	Util.BackgroundScreen.ChangeColor();
 				asteroids.Clear ();
 				bullets.Clear ();
 				CreateAsteroids ();
 				Settings.Score = (int)score;
 				Settings.Level = level;
 				Settings.LastScoreSaved = false;
-				if(brokeHighScore)
+				if (brokeHighScore)
 					Settings.HighScore = (int)score;
-					
+				
 			}
 			
 		}
@@ -591,18 +683,17 @@ namespace AsteroidsHD
 			
 			if (ship.Velocity.X > MaxSpeed) {
 				ship.Velocity = new Vector2 (MaxSpeed, ship.Velocity.Y);
-			}
-			if (ship.Velocity.X < -MaxSpeed) {
+			} else if (ship.Velocity.X < -MaxSpeed) {
 				ship.Velocity = new Vector2 (-MaxSpeed, ship.Velocity.Y);
 			}
 			if (ship.Velocity.Y > MaxSpeed) {
 				ship.Velocity = new Vector2 (ship.Velocity.X, MaxSpeed);
 			}
-			if (ship.Velocity.Y < -MaxSpeed) {
+			else if (ship.Velocity.Y < -MaxSpeed) {
 				ship.Velocity = new Vector2 (ship.Velocity.X, -MaxSpeed);
 			}
 		}
-		
+
 		const float dec = 0.03f;
 		private void DecelerateShip ()
 		{
@@ -628,6 +719,11 @@ namespace AsteroidsHD
 		{
 			Util.BackgroundScreen.Velocity = ship.Velocity;
 			ship.Position += ship.Velocity;
+			if(IsTutorial)
+			{
+				var maxDistance = Math.Max(Math.Abs(ship.Velocity.X),Math.Abs(ship.Velocity.Y));
+				distanceTraveled += maxDistance;
+			}
 			
 			if (ship.Position.X + ship.Width < 0) {
 				ship.Position = new Vector2 (ScreenWidth, ship.Position.Y);
@@ -641,25 +737,24 @@ namespace AsteroidsHD
 			if (ship.Position.Y - ship.Height > ScreenHeight) {
 				ship.Position = new Vector2 (ship.Position.X, 0);
 			}
-			if(isFreeManVisible)
-			{
-				if(CheckSpriteCollision(ship,freeManSprite))
-				{
+			if (isFreeManVisible) {
+				if (CheckSpriteCollision (ship, freeManSprite)) {
 					isFreeManVisible = false;
-					lives ++;
+					lives++;
 				}
 			}
 		}
 
 		private void CreateAsteroids ()
 		{
-			if(!hasAsteroids)
+			if (IsTutorial)
 				return;
 			int value;
-			var asteroidCount = baseAsteroids + System.Math.Floor((double)level/2);
+			var asteroidCount = baseAsteroids + System.Math.Floor ((double)level / 2);
 			//asteroidCount = 1;
+			Vector2 offset = ship.Position - new Vector2 (ScreenWidth / 2, ScreenHeight / 2);
 			for (int i = 0; i < asteroidCount; i++) {
-				Console.WriteLine("Creating asteroid " + i + " of " + asteroidCount);
+				Console.WriteLine ("Creating asteroid " + i + " of " + asteroidCount);
 				int index = random.Next (0, asteroidTextures.Count - 1);
 				Asteroid tempAsteroid = new Asteroid (asteroidTextures[index]);
 				tempAsteroid.Index = 1;
@@ -690,14 +785,15 @@ namespace AsteroidsHD
 					yPos = ScreenHeight - random.NextDouble () * 40;
 					break;
 				}
-				tempAsteroid.Position = new Vector2 ((float)xPos, (float)yPos);
+				tempAsteroid.Position = new Vector2 ((float)xPos, (float)yPos) + offset;
 				
-				Console.WriteLine("New Asteroid " + value + " , " + tempAsteroid.Position);
+				
+				Console.WriteLine ("New Asteroid " + value + " , " + tempAsteroid.Position);
 				tempAsteroid.Velocity = RandomVelocity ();
 				
 				tempAsteroid.Rotation = (float)random.NextDouble () * MathHelper.Pi * 4 - MathHelper.Pi * 2;
 				tempAsteroid.RotationSpin = (float)random.NextDouble () * random.Next (-1, 1);
-				tempAsteroid.Create ();				
+				tempAsteroid.Create ();
 				asteroids.Add (tempAsteroid);
 			}
 		}
@@ -723,22 +819,21 @@ namespace AsteroidsHD
 					a.Position = new Vector2 (a.Position.X, 0);
 				}
 				
-				if (a.Alive && invinisbleTimeLeft <= 0 && CheckSpriteCollision (ship,a) ) {
+				if (a.Alive && invinisbleTimeLeft <= 0 && CheckSpriteCollision (ship, a)) {
 					if (a.Index == 1)
-							UpdateScore(20);
-						else if (a.Index == 2)
-							UpdateScore(50);
-						else
-							UpdateScore(100);
+						UpdateScore (20); else if (a.Index == 2)
+						UpdateScore (50);
+					else
+						UpdateScore (100);
 					GamePad.SetVibration (PlayerIndex.One, 1f, 1f);
 					if (Settings.UseSound)
 						playerDied.Play ();
 					if (gameType != GameType.Retro)
 						particles.CreatePlayerExplosion (new Vector2 (a.Position.X + a.Width / 2, a.Position.Y + a.Height / 2));
 					a.Kill ();
-					destroyed.Add(a);
-					if(a.AsteroidTexture.IsFriend)
-						a.AsteroidTexture.Friend.KilledByCount ++;
+					destroyed.Add (a);
+					if (a.AsteroidTexture.IsFriend)
+						a.AsteroidTexture.Friend.KilledByCount++;
 					lives--;
 					invinisbleTimeLeft = invinsibleResetTime;
 					shipResetSeconds = gameTime.TotalRealTime.TotalSeconds;
@@ -750,9 +845,8 @@ namespace AsteroidsHD
 				}
 			}
 			//Console.WriteLine(asteroids.Count);
-			foreach(var a in destroyed)
-			{
-				asteroids.Remove(a);
+			foreach (var a in destroyed) {
+				asteroids.Remove (a);
 			}
 			
 		}
@@ -797,8 +891,8 @@ namespace AsteroidsHD
 			
 			distance = (float)Math.Sqrt (Cathetus1 + Cathetus2);
 			
-			int max = Math.Max(sprite1.Width,sprite2.Width) ;
-			int min = Math.Min(sprite1.Width,sprite2.Width);
+			int max = Math.Max (sprite1.Width, sprite2.Width);
+			int min = Math.Min (sprite1.Width, sprite2.Width);
 			//int width = min + (max - min) / 2;
 			int width = sprite1.Width + (sprite2.Width - sprite1.Width) / 2;
 			//if(asteroid == asteroids[0])
@@ -809,24 +903,23 @@ namespace AsteroidsHD
 			} else
 				return false;
 		}
-		
-		private void UpdateScore(int inScore)
+
+		private void UpdateScore (int inScore)
 		{
-			score += inScore; 
-			if(score > LocalHighScore)
-			{
-				brokeHighScore = true; 
+			score += inScore;
+			if (score > LocalHighScore) {
+				brokeHighScore = true;
 				LocalHighScore = score;
 			}
 			pointsForFreeMan += inScore;
-			if(pointsForFreeMan >= freeManPoints)
-			{
-				lives ++;
+			if (pointsForFreeMan >= freeManPoints) {
+				lives++;
 				pointsForFreeMan = pointsForFreeMan - freeManPoints;
 			}
 		}
-		
+
 		private float bulletMaxDistance = -1;
+		
 		public float BulletMaxDistance {
 			get {
 				if (bulletMaxDistance == -1)
@@ -834,6 +927,7 @@ namespace AsteroidsHD
 				return bulletMaxDistance;
 			}
 		}
+		
 		private void UpdateBullets (GameTime gameTime)
 		{
 			List<Asteroid> destroyed = new List<Asteroid> ();
@@ -859,16 +953,14 @@ namespace AsteroidsHD
 				foreach (Asteroid a in asteroids) {
 					if (a.Alive && CheckSpriteCollision (a, b)) {
 						if (a.Index == 1)
-							UpdateScore(20);
-						else if (a.Index == 2)
-							UpdateScore(50);
+							UpdateScore (20); else if (a.Index == 2)
+							UpdateScore (50);
 						else
-							UpdateScore(100);
+							UpdateScore (100);
 						
 						a.Kill ();
-						if(a.AsteroidTexture.IsFriend)
-						{
-							a.AsteroidTexture.Friend.HitCount ++;
+						if (a.AsteroidTexture.IsFriend) {
+							a.AsteroidTexture.Friend.HitCount++;
 						}
 						destroyed.Add (a);
 						b.Kill ();
@@ -900,8 +992,8 @@ namespace AsteroidsHD
 			}
 			
 			foreach (Asteroid a in destroyed) {
-				SplitAsteroid (a,gameTime);
-				asteroids.Remove(a);
+				SplitAsteroid (a, gameTime);
+				asteroids.Remove (a);
 			}
 		}
 
@@ -910,7 +1002,8 @@ namespace AsteroidsHD
 			int count = 2;
 			return count;
 		}
-		private void SplitAsteroid (Asteroid a,GameTime gameTime)
+		
+		private void SplitAsteroid (Asteroid a, GameTime gameTime)
 		{
 			int splitCount = asteroidSplitCount (a.Index);
 			if (a.Index == 1) {
@@ -922,15 +1015,16 @@ namespace AsteroidsHD
 					NewAsteroid (a, 3);
 				}
 			}
-			spawnDrops(a.Position,gameTime);
+			spawnDrops (a.Position, gameTime);
 		}
-		Random spawnRandom = new Random();
-		private void spawnDrops(Vector2 position,GameTime gameTime)
+		
+		Random spawnRandom = new Random ();
+		
+		private void spawnDrops (Vector2 position, GameTime gameTime)
 		{
-			var number = spawnRandom.Next(100);
-			if( number > 95)
-			{
-				if(isFreeManVisible)
+			var number = spawnRandom.Next (100);
+			if (number > 95) {
+				if (isFreeManVisible)
 					return;
 				isFreeManVisible = true;
 				freeManSprite.Position = position;
@@ -974,6 +1068,8 @@ namespace AsteroidsHD
 
 		private void FireBullet ()
 		{
+			if(IsTutorial)
+				tutorialShootCount ++;
 			Sprite newBullet = new Sprite (bullet.Texture);
 			
 			Vector2 velocity = new Vector2 ((float)Math.Cos (ship.Rotation - (float)MathHelper.PiOver2), (float)Math.Sin (ship.Rotation - (float)MathHelper.PiOver2));
@@ -1013,23 +1109,29 @@ namespace AsteroidsHD
 			spriteBatch.Begin (SpriteSortMode.Deferred, null, null, null, null, null, _view);
 			//spriteBatch.Begin();
 			Vector2 position = new Vector2 (10, 10);
+			float textScale = .75f;
+			float textSaleInvert = 1 / textScale;
 			
-			spriteBatch.DrawString (myFont, "Score = " + score.ToString (), position, Color.White);
+			
+			spriteBatch.DrawString (myFont, "Score = " + score.ToString (), position, Color.White, 0, position, textScale, SpriteEffects.None, 1f);
 			
 			var highScoreText = "High Score = " + LocalHighScore;
-			var hSize = myFont.MeasureString(highScoreText);
-			Vector2 highScorePos = new Vector2(ScreenWidth - 10 - hSize.X,10);			
-			spriteBatch.DrawString (myFont, highScoreText, highScorePos, Color.White);
+			var hSize = myFont.MeasureString (highScoreText);
+			Vector2 highScorePos = new Vector2 (ScreenWidth - 10 - hSize.X / textSaleInvert, 10);
+			spriteBatch.DrawString (myFont, highScoreText, highScorePos, Color.White, 0, position, textScale, SpriteEffects.None, 1f);
+			;
 			var levelString = "Level";
-			var lString = level.ToString();
-			var levelSize = myFont.MeasureString(levelString);
-			var lSize = myFont.MeasureString(lString);
+			var lString = level.ToString ();
+			var levelSize = myFont.MeasureString (levelString);
+			var lSize = myFont.MeasureString (lString);
 			
-			Vector2 levelPos = new Vector2((ScreenWidth - levelSize.X )/2,10);
-			Vector2 lPos = new Vector2((ScreenWidth - lSize.X )/2,10 + levelSize.Y);
+			Vector2 levelPos = new Vector2 ((ScreenWidth - levelSize.X / textSaleInvert) / 2, 10);
+			Vector2 lPos = new Vector2 ((ScreenWidth - lSize.X / textSaleInvert) / 2, 10 + levelSize.Y);
 			
-			spriteBatch.DrawString(myFont,levelString,levelPos,Color.White);
-			spriteBatch.DrawString(myFont,lString,lPos,Color.White);
+			spriteBatch.DrawString (myFont, levelString, levelPos, Color.White, 0, position, textScale, SpriteEffects.None, 1f);
+			
+			spriteBatch.DrawString (myFont, lString, lPos, Color.White, 0, position, textScale, SpriteEffects.None, 1f);
+			
 			
 			Rectangle shipRect;
 			/*
@@ -1038,21 +1140,22 @@ namespace AsteroidsHD
 				
 				spriteBatch.Draw (ship.StandardTexture, shipRect, Color.White);
 			}
-			*/
-			shipRect = new Rectangle (10, 40, ship.Width, ship.Height);
+			*/			
+			shipRect = new Rectangle (10, (int)(hSize.Y / textSaleInvert + position.Y), ship.Width, ship.Height);
 			
 			spriteBatch.Draw (ship.StandardTexture, shipRect, Color.White);
 			
-			string livesString =  " x " + lives;
-			spriteBatch.DrawString (myFont, livesString, new Vector2(ship.Width + shipRect.X,shipRect.Y) , Color.White);
+			string livesString = " x " + (lives -1);
+			spriteBatch.DrawString (myFont, livesString, new Vector2 (ship.Width + shipRect.X, shipRect.Y), Color.White);
 			
+
 			
 			//if invinsible show every other second
 			if (invinisbleTimeLeft <= 0 || (int)(invinisbleTimeLeft * 10) % 2 == 1)
 				spriteBatch.Draw (ship.Texture, ship.Position, null, Color.White, ship.Rotation, ship.Center, ship.Scale, SpriteEffects.None, 1.0f);
 			//Draw free man
-			if(isFreeManVisible && (freeManVisibleTimeLeft > freeManBlinkTime || (int)(freeManVisibleTimeLeft * 10) % 2 == 1))
-				spriteBatch.Draw(freeManSprite.Texture,freeManSprite.Position,null,Color.White,freeManSprite.Rotation,freeManSprite.Center,freeManSprite.Scale,SpriteEffects.None,1f);
+			if (isFreeManVisible && (freeManVisibleTimeLeft > freeManBlinkTime || (int)(freeManVisibleTimeLeft * 10) % 2 == 1))
+				spriteBatch.Draw (freeManSprite.Texture, freeManSprite.Position, null, Color.White, freeManSprite.Rotation, freeManSprite.Center, freeManSprite.Scale, SpriteEffects.None, 1f);
 			foreach (Sprite b in bullets) {
 				if (b.Alive) {
 					spriteBatch.Draw (b.Texture, b.Position, null, Color.White, b.Rotation, b.Center, b.Scale, SpriteEffects.None, 1.0f);
@@ -1072,50 +1175,18 @@ namespace AsteroidsHD
 			
 			if (gameType != GameType.Retro)
 				particles.Draw ();
+									
+			if(IsTutorial)
+			{
+				spriteBatch.DrawString (myFont, tutorialText, tutorialTextPosition , Color.White, 0, Vector2.Zero, textScale, SpriteEffects.None, 1f);
+			}
 			spriteBatch.End ();
 			
 			if (TransitionPosition > 0)
 				ScreenManager.FadeBackBufferToBlack (255 - TransitionAlpha);
-			
-			base.Draw(gameTime);
+
+			base.Draw (gameTime);
 		}
-			/*
-			//GL.Viewport (0, 0, Size.Width, Size.Height);
-				
-			GL.MatrixMode (All.Projection);
-			GL.LoadIdentity ();
-			GL.Ortho (-1.0f, 1.0f, -1.5f, 1.5f, -1.0f, 1.0f);
-			GL.MatrixMode (All.Modelview);
-			GL.Rotate (3.0f, 1.0f, 1.0f, 1.0f);
-			
-			GL.Enable(All.Texture2D);
-			
-			float[] light = {0.3f, 0.3f, 0.3f, 1.0f};
-			//GL.light
-			
-			//GL.ClearColor (0.5f, 0.5f, 0.5f, 1.0f);
-			//GL.Clear ((uint)All.ColorBufferBit);
-			//
-			
-			GL.EnableClientState (All.VertexArray);			
-			GL.EnableClientState (All.NormalArray);
-			//GL.Enable(All.ColorArray);
-			GL.NormalPointer(All.Float,0,AwesomeAsteroid.Normals);
-			GL.VertexPointer(3,All.Float,0,AwesomeAsteroid.Verticies);
-			GL.TexCoordPointer(2,All.Float,0,AwesomeAsteroid.TextureCoords);
-			//GL.TexParameter(All.Texture2D,All.TextureWrapS,(int)All.ClampToEdge);
-			//GL.TexParameter(All.Texture2D,All.TextureWrapT,(int)All.ClampToEdge);
-			
-			//GL.ActiveTexture(All.Texture1);
-			//Texture.Bind();
-			GL.ClientActiveTexture(All.Texture0);
-			GL.BindTexture(All.Texture2D,asteroid.ID);	
-			//GL.ColorPointer(3,All.ColorArray,0,squareColors);
-			GL.DrawArrays (All.TriangleStrip, 0,AwesomeAsteroid.Verticies.Length);
-			*/			
-			
-			//base.Draw (gameTime);
+	}
 		
-		
-			}
-}
+	}

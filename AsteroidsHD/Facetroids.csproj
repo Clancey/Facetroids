@@ -17,6 +17,7 @@
     <BundleVersion>1.0</BundleVersion>
     <BundleIcon>logo.png</BundleIcon>
     <BundleIconHigh>logo@2x.png</BundleIconHigh>
+    <BundleIconIPad>logo-ipad.png</BundleIconIPad>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -82,12 +83,12 @@
     <MtouchDebug>False</MtouchDebug>
     <MtouchUseThumb>false</MtouchUseThumb>
     <ConsolePause>false</ConsolePause>
-    <CodesignKey>iPhone Developer: James Clancey (MPFNK7YA6W)</CodesignKey>
+    <CodesignKey>iPhone Distribution: Interactive Innovative Solutions LLC</CodesignKey>
     <MtouchArch>ARMv6</MtouchArch>
-    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
     <AssemblyName>Faceteroids</AssemblyName>
     <MtouchI18n />
-    <CodesignProvision>CA889BD3-5FC4-41F6-BAE6-208C0242E7E2</CodesignProvision>
+    <CodesignProvision>B357200F-29D3-4BA0-B112-B7DCA7442F56</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -106,17 +107,12 @@
   </ProjectExtensions>
   <ItemGroup>
     <None Include="Info.plist" />
-    <None Include="logo.png" />
-    <None Include="logo%402x.png" />
-    <None Include="logo-ipad.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Extender.cs" />
     <Compile Include="FaceImages\Constants.cs" />
-    <Compile Include="3dObj\ObjModel.cs" />
-    <Compile Include="3dObj\ObjModelLoader.cs" />
     <Compile Include="FaceImages\Graphics.cs" />
     <Compile Include="FaceImages\ImageStore.cs" />
     <Compile Include="FaceImages\LRUCache.cs" />
@@ -161,10 +157,12 @@
     <Compile Include="Models\FriendResult.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Sprite.cs" />
+    <Compile Include="Screens\Tutorial\ThrustScreen.cs" />
+    <Compile Include="Screens\Tutorial\ShootScreen.cs" />
+    <Compile Include="Screens\Tutorial\RotateScreen.cs" />
+    <Compile Include="Screens\Tutorial\CollectScreen.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\background.png" />
-    <Content Include="Content\BANNER.bmp" />
     <Content Include="Content\gamepad.png" />
     <Content Include="Content\shot-frame1.png" />
     <Content Include="Content\Fonts\SpriteFont1.xnb" />
@@ -198,10 +196,24 @@
     <Content Include="Content\leftArrow.png" />
     <Content Include="Content\asteroid.png" />
     <Content Include="Content\asteroid%402x.png" />
-    <Content Include="Content\PrimaryBackground-green.png" />
-    <Content Include="Content\PrimaryBackground-purple.png" />
-    <Content Include="Content\PrimaryBackground-teal.png" />
-    <Content Include="Content\PrimaryBackground-yellow.png" />
+    <Content Include="Default-Landscape~ipad.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Default-Landscape~iphone.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Default-Landscape%402x~iphone.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Default.png" />
+    <Content Include="Default%402x.png" />
+    <Content Include="Content\Tutorial\shootScreen.png" />
+    <Content Include="Content\Tutorial\thrustScreen.png" />
+    <Content Include="Content\facetroids-ipad.png" />
+    <Content Include="Content\facetroids.png" />
+    <Content Include="logo.png" />
+    <Content Include="logo%402x.png" />
+    <Content Include="logo-ipad.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
@@ -217,5 +229,6 @@
     <Folder Include="Content\Retro\" />
     <Folder Include="FaceImages\" />
     <Folder Include="ClanceyLib\" />
+    <Folder Include="Screens\Tutorial\" />
   </ItemGroup>
 </Project>
