@@ -290,7 +290,7 @@ namespace AsteroidsHD
 		/// </summary>
 		public virtual void Draw (GameTime gameTime)
 		{
-			/*
+			
 			 _total_frames++;
             //GraphicsDevice.Clear(Color.CornflowerBlue);
  			SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
@@ -298,7 +298,7 @@ namespace AsteroidsHD
             spriteBatch.DrawString(ScreenManager.Font, string.Format("FPS={0}", _fps),
                 new Vector2(10.0f, 60.0f), Color.White);
             spriteBatch.End();
-            */
+            
 			
 		}
 

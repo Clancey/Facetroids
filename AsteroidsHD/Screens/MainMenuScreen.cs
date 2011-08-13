@@ -47,7 +47,7 @@ namespace AsteroidsHD
 			// Hook up menu event handlers.
 			playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
 			optionsMenuEntry.Selected += OptionsMenuEntrySelected;
-			getFacebookFaces.Selected += OnGetFacebook;
+			getFacebookFaces.Selected += HandleGetFacebookFacesSelected;;
 			HighScores.Selected += HandleHighScoresSelected;
 			HowTowPlay.Selected += HandleHowTowPlaySelected;
 			
@@ -58,6 +58,12 @@ namespace AsteroidsHD
 			MenuEntries.Add (HowTowPlay);
 			MenuEntries.Add (getFacebookFaces);
 			
+		}
+
+		void HandleGetFacebookFacesSelected (object sender, PlayerIndexEventArgs e)
+		{
+			Util.MainGame.Window.Add(new FriendsViewController().View);
+			//Facebook.DownloadFaces();
 		}
 
 		Texture2D logo;
@@ -93,7 +99,10 @@ namespace AsteroidsHD
 			if (Settings.GameType == GameType.Retro)
 				LoadingScreen.Load (ScreenManager, true, e.PlayerIndex, new GameplayScreen (!Settings.HasSeenTutorial));
 			else
+			{
+				Util.BackgroundScreen.AutoMove = false;
 				LoadingScreen.Load (ScreenManager, true, e.PlayerIndex, new GameScreen[] { Util.BackgroundScreen, new GameplayScreen (!Settings.HasSeenTutorial) });
+			}
 		}
 
 
@@ -102,7 +111,10 @@ namespace AsteroidsHD
 			if (Settings.GameType == GameType.Retro)
 				LoadingScreen.Load (ScreenManager, true, e.PlayerIndex, new GameplayScreen (true));
 			else
+			{
+				Util.BackgroundScreen.AutoMove = false;
 				LoadingScreen.Load (ScreenManager, true, e.PlayerIndex, new GameScreen[] { Util.BackgroundScreen, new GameplayScreen (true) });
+			}
 		}
 		/// <summary>
 		/// Event handler for when the Options menu entry is selected.
@@ -121,19 +133,7 @@ namespace AsteroidsHD
 		/// <summary>
 		/// When the user cancels the main menu, ask if they want to exit the sample.
 		/// </summary>
-		protected override void OnCancel (PlayerIndex playerIndex)
-		{
-			/*
-            const string message = "Are you sure you want to exit?";
 
-            MessageBoxScreen confirmExitMessageBox = new MessageBoxScreen(message);
-
-            confirmExitMessageBox.Accepted += ConfirmExitMessageBoxAccepted;
-
-            ScreenManager.AddScreen(confirmExitMessageBox, playerIndex);
-            */			
-			Facebook.DownloadFaces();
-		}
 
 		public override void Draw (GameTime gameTime)
 		{

@@ -44,7 +44,7 @@ namespace AsteroidsHD
         SpriteBatch spriteBatch;
         SpriteFont font;
         Texture2D blankTexture;
-		public float Scale;
+		public float Scale = UIScreen.MainScreen.Scale;
 
         bool isInitialized;
 

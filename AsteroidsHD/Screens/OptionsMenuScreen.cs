@@ -80,7 +80,7 @@ namespace AsteroidsHD
 				Settings.Sensativity = value;
 			};
 			
-			backMenuEntry.Selected+= OnGetFacebook;;
+			backMenuEntry.Selected+= OnCancel;;
 			
 			Console.WriteLine("adding menu entries");
 			// Add entries to the menu.

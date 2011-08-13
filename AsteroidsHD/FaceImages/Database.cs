@@ -31,6 +31,11 @@ namespace AsteroidsHD
 				Settings.DbVersion = 1;
 			}
 			Main = new Database (asteroids);
+			if(Settings.DbVersion < 2)
+			{
+				Main.Execute("update Friend set Exclude = '0'");
+				Settings.DbVersion = 2;
+			}
 		}
 		
 		static public Database Main { get; private set; }

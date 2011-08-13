@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using MonoTouch.UIKit;
 namespace AsteroidsHD
 {
     /// <summary>
@@ -39,7 +40,6 @@ namespace AsteroidsHD
 			
 			graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
-
         }
 		
 		protected override void Initialize ()
@@ -51,6 +51,7 @@ namespace AsteroidsHD
             Components.Add(ScreenManager);
 
             // Activate the first screens.
+			Util.BackgroundScreen.AutoMove = true;
             ScreenManager.AddScreen(Util.BackgroundScreen, null);
             ScreenManager.AddScreen(new MainMenuScreen(), null);
 		}
@@ -64,15 +65,17 @@ namespace AsteroidsHD
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
-        protected override void Draw(GameTime gameTime)
+        /// 
+        
+		protected override void Draw(GameTime gameTime)
         {
 			//FaceDetection.DetectFaces();
-            graphics.GraphicsDevice.Clear(Color.Black);
-
+            //graphics.GraphicsDevice.Clear(Color.Black);
+			//Console.WriteLine("drawing");
             // The real drawing happens inside the screen manager component.
             base.Draw(gameTime);
         }
-
+		 
 
         #endregion
     }

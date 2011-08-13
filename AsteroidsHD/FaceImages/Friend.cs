@@ -17,6 +17,8 @@ namespace AsteroidsHD
 		public string Img {get;set;}
 		public string DisplayName {get;set;}
 		public DateTime LastFacebookPost {get;set;}
+		public bool Exclude {get;set;}
+		public bool HasFace {get;set;}
 	}
 	
 	public class Face

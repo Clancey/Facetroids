@@ -19,7 +19,8 @@ namespace AsteroidsHD
 			};;
 			
 			quiteMenu.Selected += delegate {
-				LoadingScreen.Load(ScreenManager, false, null, new BackgroundScreen(), new MainMenuScreen());
+				Util.BackgroundScreen.AutoMove = true;
+				LoadingScreen.Load(ScreenManager, false, null, Util.BackgroundScreen, new MainMenuScreen());
 			};
 			
 			

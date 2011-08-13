@@ -11,10 +11,10 @@ namespace AsteroidsHD
 		{
 			Console.WriteLine("Creating slider");
 			slider = new Slider(screenManager);
-			slider.Value = value;
-			slider.ValueChanged += delegate(object sender, EventArgs e) {
+			slider.slider.Value = value;
+			slider.slider.ValueChanged += delegate(object sender, EventArgs e) {
 				if(ValueChanged != null)
-					ValueChanged(slider.Value);
+					ValueChanged(slider.slider.Value);
 			};
 		}
 		

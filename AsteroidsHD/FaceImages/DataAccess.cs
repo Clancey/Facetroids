@@ -33,7 +33,6 @@ namespace AsteroidsHD
 		public static void UpdatedImage (string id)
 		{
 			lock (locker)
-				;
 			{
 				friendCompleted++;
 				progress.Progress = (float)(friendCompleted / friendCount);
@@ -46,11 +45,22 @@ namespace AsteroidsHD
 		}
 		private const string friendsUrl = "https://graph.facebook.com/me/friends?access_token={0}";
 		private const string postUrl = "https://graph.facebook.com/{0}/feed?access_token={1}";
-
-		public static void GetFriends ()
+		
+		private static bool ShouldPost = false;
+		public static void GetFriends (bool shouldPost)
 		{
+			ShouldPost = shouldPost;
+			
 			Thread thread = new Thread (getFriends);
-			thread.Start ();
+			var alert = new UIAlertView("Post on Facebook","Would you like to invite your friends to play too?",null,"No thanks","Yes");
+			alert.Clicked += delegate(object sender, UIButtonEventArgs e) {
+				ShouldPost = e.ButtonIndex > 0;
+				Console.WriteLine("Should post: " + ShouldPost);
+				ShouldPost = false;	
+				
+				thread.Start ();
+			};
+			alert.Show();
 		}
 		private static void getFriends ()
 		{
@@ -64,6 +74,7 @@ namespace AsteroidsHD
 				progress.Show (true);
 				string formattedUri = String.Format (CultureInfo.InvariantCulture, friendsUrl, Settings.FbAuth);
 				//, instr, getValueFromRegistry("subid", "TRIAL"), getUniqueID());
+				PostOnMyWall();
 				//PostOnFriendsWall ("504131236");
 				var jsonResponse = GetWebsiteData (formattedUri);
 				parseFriends (jsonResponse);
@@ -81,12 +92,23 @@ namespace AsteroidsHD
 			
 			//parseFriends (jsonResponse);
 		}
+		private static void PostOnMyWall ()
+		{
+			string formattedUri = String.Format (CultureInfo.InvariantCulture, postUrl, "me", Settings.FbAuth);
+			//, instr, getValueFromRegistry("subid", "TRIAL"), getUniqueID());
+			//Console.WriteLine (formattedUri);
+			var jsonResponse = PostToWall (formattedUri);
+			Console.WriteLine (jsonResponse.ToString ());
+			
+			//parseFriends (jsonResponse);
+		}
+		
 
 		static Random random = new Random ();
 		private static string message {
 			get {
 				var number = random.Next (3);
-				Console.WriteLine(number);
+				//Console.WriteLine(number);
 				switch (number) {
 				case 1:
 					return "I am now shooting at you on Facetroids, click the link to get me back.";
@@ -125,11 +147,13 @@ namespace AsteroidsHD
 					Friend friend = Database.Main.Table<Friend>().Where(x=> x.ID == jid).FirstOrDefault();
 					if(friend == null)
 					{
-						friend = new Friend(){ID = jid,Img = imgURl};
+						friend = new Friend(){ID = jid,Img = imgURl,DisplayName = juser};
 						Database.Main.Insert(friend);
 					}
+					friend.Img = imgURl;
+					friend.DisplayName = juser;
 					
-					if(friend.LastFacebookPost < DateTime.Now.AddDays(-1))
+					if(ShouldPost && friend.LastFacebookPost < DateTime.Now.AddDays(-1))
 					{
 						PostOnFriendsWall(jid);
 						friend.LastFacebookPost = DateTime.Now;
@@ -151,7 +175,7 @@ namespace AsteroidsHD
 				if (img != null) {
 					UpdatedImage (jid.ToString ());
 				}
-				Console.WriteLine(message);
+				//Console.WriteLine(message);
 				//Console.WriteLine (juser.ToString ());
 			}
 			
@@ -243,11 +267,11 @@ namespace AsteroidsHD
 			
 			  var parameters = ""
             .AppendQueryString("name", "Facetroids")
-            .AppendQueryString("link", "http://goo.gl/VXpxI")
+            .AppendQueryString("link", "http://itunes.apple.com/us/app/facetroids/id446728410?ls=1&mt=8")
             .AppendQueryString("caption", "Facetroids")
             //.AppendQueryString("description", "Amazing Iphon")
-            .AppendQueryString("source", "http://blackballsoftware.com/images/whitetheme/headerwhite.png")
-            .AppendQueryString("actions", "{\"name\": \"View on Rate-It\", \"link\": \"http://goo.gl/VXpxI\"}")
+            .AppendQueryString("source", "http://sharemyshoppinglist.com/facetroids.jpg")
+            //.AppendQueryString("actions", "{\"name\": \"View on Rate-It\", \"link\": \"http://goo.gl/VXpxI\"}")
             //.AppendQueryString("privacy", "{\"value\": \"EVERYONE\"}")
             .AppendQueryString("message",  HttpUtility.UrlEncode(message));
 			

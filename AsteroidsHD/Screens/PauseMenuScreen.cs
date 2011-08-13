@@ -64,7 +64,7 @@ namespace AsteroidsHD
 				Settings.Sensativity = value;
 			};
             // Hook up menu event handlers.
-            resumeGameMenuEntry.Selected += OnGetFacebook;
+            resumeGameMenuEntry.Selected += OnCancel;
             quitGameMenuEntry.Selected += QuitGameMenuEntrySelected;
 			Console.WriteLine("adding entries");
             // Add entries to the menu.

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using MonoTouch.Facebook.Authorization;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework;
 namespace AsteroidsHD
 {
 	public static class Facebook
@@ -14,7 +15,7 @@ namespace AsteroidsHD
 			List<FriendResult> results = new List<FriendResult>();
 			lock(Database.Main)
 			{
-				foreach(var friend in Database.Main.Table<Friend>().Where(x=> true).ToList())
+				foreach(var friend in Database.Main.Table<Friend>().Where(x=> x.Exclude == false).ToList())
 				{
 					foreach(var face in Database.Main.Table<Face>().Where(x=> x.FriendId == friend.ID))
 					{
@@ -45,6 +46,21 @@ namespace AsteroidsHD
 			*/
 		}
 		
+		public static List<Friend> GetFriends()
+		{
+			List<Friend> friends = new List<Friend>();
+			lock(Database.Main)
+			{
+				foreach(var friend in Database.Main.Table<Friend>().Where(x=> x.Exclude == false).ToList())
+				{
+					 var faces = Database.Main.Table<Face>().Where(x=> x.FriendId == friend.ID).Count();
+					friend.HasFace = faces > 0;
+					friends.Add(friend);
+				}	
+			}
+			return friends;
+		}
+		
 		public static void DownloadFaces()
 		{			
 			if ((string.IsNullOrEmpty (Settings.FbAuth) || Settings.FbAuthExpire <= DateTime.Now)) {
@@ -54,7 +70,8 @@ namespace AsteroidsHD
 					Settings.FbAuthExpire = expires;
 					fvc.View.RemoveFromSuperview ();
 					TouchPanel.Reset ();
-					DataAccess.GetFriends ();
+					
+					DataAccess.GetFriends (false);
 					//BackgroundUpdater.AddToFacebook();				
 					//this.DismissModalViewControllerAnimated(true);
 				};
@@ -68,9 +85,11 @@ namespace AsteroidsHD
 					//this.NavigationController.PopViewControllerAnimated(false);
 				};
 				fvc.View.Frame = new System.Drawing.RectangleF (System.Drawing.PointF.Empty, new System.Drawing.SizeF (fvc.View.Frame.Height, fvc.View.Frame.Width));
-				Util.MainGame.View.AddSubview (fvc.View);
+				Util.MainGame.Window.AddSubview(fvc.View);
 			} else
-				DataAccess.GetFriends ();
+			{
+					DataAccess.GetFriends (false);
+			}
 			
 		}
 	}

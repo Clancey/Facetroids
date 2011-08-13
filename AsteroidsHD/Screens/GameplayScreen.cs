@@ -89,7 +89,7 @@ namespace AsteroidsHD
 
 		float distance = 0.0f;
 
-		Random random = new Random ();
+		static Random random = new Random ();
 
 		bool GameOver = true;
 
@@ -674,7 +674,7 @@ namespace AsteroidsHD
 			ship.Velocity = Vector2.Zero;
 		}
 		const float Friction = 0.09f;
-		const float MaxSpeed = 3f;
+		float MaxSpeed = Util.IsIpad ? 3f : 1f;
 		private void AccelerateShip ()
 		{
 			ship.IsThrusting = true;
@@ -717,7 +717,7 @@ namespace AsteroidsHD
 
 		public void UpdateShip ()
 		{
-			Util.BackgroundScreen.Velocity = ship.Velocity;
+			Util.BackgroundScreen.Center += ship.Velocity;
 			ship.Position += ship.Velocity;
 			if(IsTutorial)
 			{
@@ -756,6 +756,7 @@ namespace AsteroidsHD
 			for (int i = 0; i < asteroidCount; i++) {
 				Console.WriteLine ("Creating asteroid " + i + " of " + asteroidCount);
 				int index = random.Next (0, asteroidTextures.Count - 1);
+				Console.WriteLine(index + " of " + asteroidTextures.Count);
 				Asteroid tempAsteroid = new Asteroid (asteroidTextures[index]);
 				tempAsteroid.Index = 1;
 				
@@ -1145,7 +1146,9 @@ namespace AsteroidsHD
 			
 			spriteBatch.Draw (ship.StandardTexture, shipRect, Color.White);
 			
-			string livesString = " x " + (lives -1);
+			var livesRemaining = lives -1;
+			livesRemaining = livesRemaining < 0 ? 0 : livesRemaining;
+			string livesString = " x " + livesRemaining;
 			spriteBatch.DrawString (myFont, livesString, new Vector2 (ship.Width + shipRect.X, shipRect.Y), Color.White);
 			
 

@@ -74,6 +74,7 @@ namespace AsteroidsHD
 		{
 			currentScore = scoresToSend.First();
 			Console.WriteLine(currentScore.HighScoreCategory);
+			/*
 			Guide.UpdateScore(currentScore.HighScoreCategory,currentScore.Score,(success)=> {
 				if(success)
 				{
@@ -100,6 +101,8 @@ namespace AsteroidsHD
 				}
 				
 			});
+			*/
+			
 		}
 		
 		public static MainGame MainGame {
@@ -111,8 +114,8 @@ namespace AsteroidsHD
 			get {return ((Program)UIApplication.SharedApplication.Delegate).Version;}
 		}
 		
-
-		internal static AsteroidsHD.BackgroundScreen BackgroundScreen = new AsteroidsHD.BackgroundScreen();
+		internal static AsteroidsHD.BackgroundScreenOld BackgroundScreen = new BackgroundScreenOld();
+		//internal static AsteroidsHD.BackgroundScreen BackgroundScreen = new AsteroidsHD.BackgroundScreen();
 	}
 }
 

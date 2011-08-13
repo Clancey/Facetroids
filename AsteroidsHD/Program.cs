@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.IO;
 using System.Xml;
+using ClanceysLib;
 
 namespace AsteroidsHD
 {
@@ -46,6 +47,7 @@ namespace AsteroidsHD
 				alert.Show();
 			}
 			//Guide
+			AppRater.AppLaunched("446728410");
 			Console.WriteLine("load complete");
 		}
 
@@ -59,13 +61,12 @@ namespace AsteroidsHD
 			game.ScreenManager.GlobalPause();
 			TouchPanel.Reset();
 		}
-		string appName = "Facetroids";
+		string appName = "Facetroids.app";
 	
 		public bool IsInfoplistPlainText()
 		{			
 			var basedir = Path.Combine (Environment.GetFolderPath (System.Environment.SpecialFolder.Personal), ".."); 
-			string appName = "Facetroids.app";	
-			
+
 			try
 			{
 				XmlDocument doc = new XmlDocument(); 
@@ -84,7 +85,7 @@ namespace AsteroidsHD
 		public bool iTunesMetaDataExists ()
 		{
 				var basedir = Path.Combine (Environment.GetFolderPath (System.Environment.SpecialFolder.Personal), "..");
-			return File.Exists (basedir + "/iTunesMetaData.plist");
+			return File.Exists (basedir + "/" + appName + "/iTunesMetaData.plist");
 		}
 		public bool CodeSignatureFolderExists ()	
 		{
